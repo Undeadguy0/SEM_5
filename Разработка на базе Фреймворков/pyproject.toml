@@ -1,0 +1,17 @@
+[project]
+name = "seats_booking"
+version = "0.0.1"
+description = ""
+authors = [
+    {name = "Undeadguy",email = "MikhailBunto@yandex.ru"}
+]
+license = "GPLv3"
+readme = "README.md"
+requires-python = ">= 3.12"
+dependencies = [
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"

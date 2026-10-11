@@ -1,6 +1,6 @@
 """Тесты для модуля bookings.py."""
 
-from bookings import (
+from domain.bookings import (
     cancel_booking,
     create_booking,
     find_bookings_by_organizer,

@@ -1,6 +1,6 @@
 """Точка входа и меню приложения."""
 
-from bookings import (
+from domain.bookings import (
     cancel_booking,
     create_booking,
     find_bookings_by_organizer,
@@ -8,14 +8,14 @@ from bookings import (
     get_room_schedule,
     is_room_available,
 )
-from models import Booking, Room, User
-from rooms import (
+from domain.rooms import (
     filter_rooms_by_capacity,
     filter_rooms_by_equipment,
     find_room,
     get_room_by_id,
     sort_rooms,
 )
+from models import Booking, Room, User
 from storage import (
     load_bookings,
     load_rooms,

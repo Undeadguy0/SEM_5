@@ -3,7 +3,7 @@
 import json
 
 from models import Booking, Room, User
-from rooms import add_room
+from domain.rooms import add_room
 from storage import (
     load_bookings,
     load_rooms,

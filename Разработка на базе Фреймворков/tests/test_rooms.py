@@ -1,7 +1,7 @@
 """Тесты для модуля rooms.py."""
 
 from models import Room
-from rooms import (
+from domain.rooms import (
     add_room,
     check_room_capacity,
     filter_rooms_by_capacity,

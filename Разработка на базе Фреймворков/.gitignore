@@ -1,4 +1,5 @@
 .venv
+venv
 .odt
 __pycache__/
 .pytest_cache/

@@ -2,6 +2,7 @@
 max-line-length = 79
 exclude =
     .venv,
+    venv,
     .git,
     __pycache__,
     .pytest_cache,

@@ -1,4 +1,4 @@
-"""Точка входа, меню приложения."""
+"""Точка входа и меню приложения."""
 
 from bookings import (
     cancel_booking,
@@ -8,37 +8,56 @@ from bookings import (
     get_room_schedule,
     is_room_available,
 )
+from models import Booking, Room, User
 from rooms import (
     filter_rooms_by_capacity,
     filter_rooms_by_equipment,
     find_room,
+    get_room_by_id,
     sort_rooms,
 )
-from storage import load_bookings, load_rooms, save_bookings
+from storage import (
+    load_bookings,
+    load_rooms,
+    load_users,
+    save_bookings,
+    save_users,
+)
+from users import add_user, find_user_by_name
 from utils import input_date, input_int, input_time
 
 ROOMS_FILE = "data/rooms.json"
+USERS_FILE = "data/users.json"
 BOOKINGS_FILE = "data/bookings.json"
 
 
-def show_rooms(rooms: dict[int, dict]) -> None:
+def show_rooms(rooms: list[Room]) -> None:
     """Вывести список переговорных в виде таблицы.
 
     Args:
-        rooms: Словарь переговорных комнат.
+        rooms: Список переговорных.
     """
     if not rooms:
         print("Переговорных комнат нет.")
         return
 
-    print(f"{'ID':<4} {'Название':<30} {'Вместимость':<12} Оборудование")
+    print(
+        f"{'ID':<4} {'Название':<30} "
+        f"{'Вместимость':<12} Оборудование"
+    )
     print("-" * 70)
-    for room_id, room in rooms.items():
-        equipment = ", ".join(room["equipment"]) if room["equipment"] else "—"
-        print(f"{room_id:<4} {room['name']:<30} " f"{room['capacity']:<12} {equipment}")
+    for room in rooms:
+        if room.equipment:
+            equipment = ", ".join(room.equipment)
+        else:
+            equipment = "—"
+        print(
+            f"{room.id:<4} {room.name:<30} "
+            f"{room.capacity:<12} {equipment}"
+        )
 
 
-def show_bookings(bookings: list[dict]) -> None:
+def show_bookings(bookings: list[Booking]) -> None:
     """Вывести список бронирований.
 
     Args:
@@ -48,128 +67,181 @@ def show_bookings(bookings: list[dict]) -> None:
         print("Бронирований нет.")
         return
 
-    print(f"{'ID':<4} {'Комната':<8} {'Дата':<12} " f"{'Время':<13} {'Организатор':<20} Тема")
-    print("-" * 90)
+    print(
+        f"{'ID':<4} {'Комната':<24} {'Дата':<12} "
+        f"{'Время':<13} {'Организатор':<16} {'Статус':<10} Тема"
+    )
+    print("-" * 110)
     for booking in bookings:
-        time_str = f"{booking['start_time']}-{booking['end_time']}"
+        time_str = f"{booking.start_time}-{booking.end_time}"
+        if booking.is_cancelled:
+            status = "отменено"
+        else:
+            status = "активно"
         print(
-            f"{booking['id']:<4} {booking['room_id']:<8} "
-            f"{booking['date']:<12} {time_str:<13} "
-            f"{booking['organizer']:<20} {booking['topic']}"
+            f"{booking.id:<4} {booking.room.name:<24} "
+            f"{booking.booking_date:<12} {time_str:<13} "
+            f"{booking.user.name:<16} {status:<10} "
+            f"{booking.topic}"
         )
 
 
-def rooms_by_id(room_list: list[dict]) -> dict[int, dict]:
-    """Собрать словарь переговорных из списка, сохранив порядок.
-
-    Args:
-        room_list: Список записей, в каждой есть ключ id.
-
-    Returns:
-        Словарь {id: данные комнаты}.
-    """
-    return {room["id"]: room for room in room_list}
-
-
-def input_existing_room_id(rooms: dict[int, dict]) -> int | None:
+def input_existing_room_id(rooms: list[Room]) -> Room | None:
     """Запросить id существующей переговорной.
 
     Args:
-        rooms: Словарь переговорных комнат.
+        rooms: Список переговорных.
 
     Returns:
-        id комнаты или None, если такой комнаты нет.
+        Объект Room или None, если такой комнаты нет.
     """
     room_id = input_int("ID переговорной: ")
-    if room_id not in rooms:
+    room = get_room_by_id(rooms, room_id)
+    if room is None:
         print("Переговорная не найдена.")
         return None
-    return room_id
+    return room
 
 
 def input_time_slot() -> tuple[str, str, str] | None:
     """Запросить дату и интервал времени.
 
     Returns:
-        Кортеж (дата, начало, конец) или None, если интервал некорректен.
+        Кортеж (дата, начало, конец) или None,
+        если интервал некорректен.
     """
-    date = input_date("Дата (DD.MM.YYYY): ")
+    booking_date = input_date("Дата (DD.MM.YYYY): ")
     start = input_time("Время начала (HH:MM): ")
     end = input_time("Время окончания (HH:MM): ")
     if start >= end:
-        print("Ошибка: время начала должно быть раньше времени окончания.")
+        print("Ошибка: время начала должно быть раньше окончания.")
         return None
-    return date, start, end
+    return booking_date, start, end
 
 
-def menu_show_all_rooms(rooms: dict[int, dict]) -> None:
-    """Показать все переговорные."""
+def input_new_email() -> str:
+    """Запросить email, повторяя ввод при ошибке.
+
+    Returns:
+        Непустой email, содержащий символ @.
+    """
+    while True:
+        email = input("Email нового организатора: ").strip()
+        missing_at = "@" not in email
+        bad_edges = email.startswith("@") or email.endswith("@")
+        if missing_at or bad_edges:
+            print("Ошибка: укажите email, например user@example.com.")
+            continue
+        return email
+
+
+def ask_organizer(users: list[User]) -> User | None:
+    """Найти организатора по имени или создать нового пользователя.
+
+    Args:
+        users: Список пользователей.
+
+    Returns:
+        Объект User или None, если имя пустое.
+    """
+    name = input("Организатор: ").strip()
+    if not name:
+        print("Организатор не может быть пустым.")
+        return None
+
+    existing = find_user_by_name(users, name)
+    if existing is not None:
+        print(f"Организатор: {existing}")
+        return existing
+
+    email = input_new_email()
+    user = add_user(users, name, email)
+    save_users(USERS_FILE, users)
+    print(f"Создан пользователь: {user}")
+    return user
+
+
+def menu_show_all_rooms(rooms: list[Room]) -> None:
+    """Показать все переговорные, отсортированные по вместимости."""
     print("\n=== Все переговорные ===")
-    show_rooms(rooms_by_id(sort_rooms(rooms)))
+    show_rooms(sort_rooms(rooms))
 
 
-def menu_find_by_name(rooms: dict[int, dict]) -> None:
+def menu_find_by_name(rooms: list[Room]) -> None:
     """Найти переговорную по названию."""
     query = input("Введите часть названия: ").strip()
     results = find_room(rooms, query)
     print(f"\nНайдено: {len(results)}")
     if results:
-        show_rooms(rooms_by_id(results))
+        show_rooms(results)
 
 
-def menu_find_by_capacity(rooms: dict[int, dict]) -> None:
+def menu_find_by_capacity(rooms: list[Room]) -> None:
     """Найти переговорные по вместимости."""
     min_cap = input_int("Минимальная вместимость: ")
     results = filter_rooms_by_capacity(rooms, min_cap)
     print(f"\nНайдено: {len(results)}")
     if results:
-        show_rooms(rooms_by_id(results))
+        show_rooms(results)
 
 
-def menu_find_by_equipment(rooms: dict[int, dict]) -> None:
+def menu_find_by_equipment(rooms: list[Room]) -> None:
     """Найти переговорные по оборудованию."""
     query = input("Введите оборудование через запятую: ").strip()
-    required = [item.strip() for item in query.split(",") if item.strip()]
+    required = [
+        item.strip()
+        for item in query.split(",")
+        if item.strip()
+    ]
     results = filter_rooms_by_equipment(rooms, required)
     print(f"\nНайдено: {len(results)}")
     if results:
-        show_rooms(rooms_by_id(results))
+        show_rooms(results)
 
 
-def menu_check_availability(rooms: dict[int, dict], bookings: list[dict]) -> None:
-    """Проверить доступность переговорной."""
-    room_id = input_existing_room_id(rooms)
-    if room_id is None:
+def menu_check_availability(
+    rooms: list[Room],
+    bookings: list[Booking],
+) -> None:
+    """Проверить, свободна ли переговорная на дату."""
+    room = input_existing_room_id(rooms)
+    if room is None:
         return
 
-    slot = input_time_slot()
-    if slot is None:
-        return
-    date, start, end = slot
-
-    available = is_room_available(bookings, room_id, date, start, end)
+    booking_date = input_date("Дата (DD.MM.YYYY): ")
+    available = is_room_available(bookings, room.id, booking_date)
     status = get_booking_status(available)
-    print(f"\n{rooms[room_id]['name']} на {date} {start}-{end}: {status}")
+    print(f"\n{room} на {booking_date}: {status}")
 
 
-def menu_create_booking(rooms: dict[int, dict], bookings: list[dict]) -> None:
-    """Забронировать переговорную."""
-    room_id = input_existing_room_id(rooms)
-    if room_id is None:
+def create_new_booking(
+    rooms: list[Room],
+    users: list[User],
+    bookings: list[Booking],
+) -> None:
+    """Создать бронирование через диалог с пользователем.
+
+    Args:
+        rooms: Список переговорных.
+        users: Список пользователей.
+        bookings: Список бронирований.
+    """
+    room = input_existing_room_id(rooms)
+    if room is None:
         return
 
     slot = input_time_slot()
     if slot is None:
         return
-    date, start, end = slot
+    booking_date, start, end = slot
 
-    if not is_room_available(bookings, room_id, date, start, end):
+    if not is_room_available(bookings, room.id, booking_date):
         print(get_booking_status(False))
+        print("На эту дату уже есть активное бронирование.")
         return
 
-    organizer = input("Организатор: ").strip()
-    if not organizer:
-        print("Организатор не может быть пустым.")
+    organizer = ask_organizer(users)
+    if organizer is None:
         return
 
     topic = input("Тема встречи: ").strip()
@@ -177,58 +249,75 @@ def menu_create_booking(rooms: dict[int, dict], bookings: list[dict]) -> None:
         print("Тема не может быть пустой.")
         return
 
-    booking = create_booking(bookings, room_id, date, start, end, organizer, topic)
-    if booking:
-        save_bookings(BOOKINGS_FILE, bookings)
-        print(f"Бронирование создано (ID: {booking['id']}).")
-    else:
+    booking = create_booking(
+        bookings,
+        room,
+        organizer,
+        booking_date,
+        start,
+        end,
+        topic,
+    )
+    if booking is None:
         print("Не удалось создать бронирование.")
+        return
+
+    save_bookings(BOOKINGS_FILE, bookings)
+    print(f"Бронирование создано: {booking}")
 
 
-def menu_cancel_booking(bookings: list[dict]) -> None:
-    """Отменить бронирование."""
+def cancel_existing_booking(bookings: list[Booking]) -> None:
+    """Отменить бронирование по id.
+
+    Args:
+        bookings: Список бронирований.
+    """
     booking_id = input_int("ID бронирования для отмены: ")
     if cancel_booking(bookings, booking_id):
         save_bookings(BOOKINGS_FILE, bookings)
         print("Бронирование отменено.")
-    else:
-        print("Бронирование не найдено.")
+        return
+    print("Бронирование не найдено.")
 
 
-def menu_show_all_bookings(bookings: list[dict]) -> None:
+def menu_show_all_bookings(bookings: list[Booking]) -> None:
     """Показать все бронирования."""
     print("\n=== Все бронирования ===")
     show_bookings(bookings)
 
 
-def menu_room_schedule(rooms: dict[int, dict], bookings: list[dict]) -> None:
-    """Расписание переговорной на дату."""
-    room_id = input_existing_room_id(rooms)
-    if room_id is None:
+def menu_room_schedule(
+    rooms: list[Room],
+    bookings: list[Booking],
+) -> None:
+    """Показать расписание переговорной на дату."""
+    room = input_existing_room_id(rooms)
+    if room is None:
         return
 
-    date = input_date("Дата (DD.MM.YYYY): ")
-    schedule = get_room_schedule(bookings, room_id, date)
-    print(f"\nРасписание {rooms[room_id]['name']} на {date}:")
+    booking_date = input_date("Дата (DD.MM.YYYY): ")
+    schedule = get_room_schedule(bookings, room.id, booking_date)
+    print(f"\nРасписание: {room.name} на {booking_date}")
     if schedule:
         show_bookings(schedule)
-    else:
-        print("Бронирований на эту дату нет.")
+        return
+    print("Бронирований на эту дату нет.")
 
 
-def menu_my_bookings(bookings: list[dict]) -> None:
-    """Мои бронирования (по организатору)."""
+def menu_my_bookings(bookings: list[Booking]) -> None:
+    """Показать бронирования организатора."""
     organizer = input("Имя организатора: ").strip()
-    results = find_bookings_by_organizer(bookings, organizer)
-    print(f"\nБронирований организатора '{organizer}': {len(results)}")
-    if results:
-        show_bookings(results)
+    found = find_bookings_by_organizer(bookings, organizer)
+    print(f"\nБронирований организатора «{organizer}»: {len(found)}")
+    if found:
+        show_bookings(found)
 
 
 def main() -> None:
     """Точка запуска приложения."""
     rooms = load_rooms(ROOMS_FILE)
-    bookings = load_bookings(BOOKINGS_FILE)
+    users = load_users(USERS_FILE)
+    bookings = load_bookings(BOOKINGS_FILE, rooms, users)
 
     menu_items = {
         "1": (
@@ -253,11 +342,11 @@ def main() -> None:
         ),
         "6": (
             "Забронировать переговорную",
-            lambda: menu_create_booking(rooms, bookings),
+            lambda: create_new_booking(rooms, users, bookings),
         ),
         "7": (
             "Отменить бронирование",
-            lambda: menu_cancel_booking(bookings),
+            lambda: cancel_existing_booking(bookings),
         ),
         "8": (
             "Показать все бронирования",
@@ -275,16 +364,14 @@ def main() -> None:
 
     while True:
         print("\n=== Система бронирования переговорных комнат ===")
-        for key, (desc, _) in menu_items.items():
-            print(f"{key}. {desc}")
+        for key, (description, _) in menu_items.items():
+            print(f"{key}. {description}")
         print("0. Выход")
 
         choice = input("\nВыберите действие: ").strip()
-
         if choice == "0":
             print("До свидания!")
             break
-
         if choice in menu_items:
             menu_items[choice][1]()
         else:

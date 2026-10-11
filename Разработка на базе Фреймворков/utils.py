@@ -35,7 +35,10 @@ def input_date(prompt: str) -> str:
             dt = datetime.strptime(value, "%d.%m.%Y")
             return dt.strftime("%Y-%m-%d")
         except ValueError:
-            print("Ошибка: введите дату в формате DD.MM.YYYY " "(например, 29.09.2026).")
+            print(
+                "Ошибка: введите дату в формате DD.MM.YYYY "
+                "(например, 29.09.2026)."
+            )
 
 
 def input_time(prompt: str) -> str:
@@ -53,4 +56,7 @@ def input_time(prompt: str) -> str:
             datetime.strptime(value, "%H:%M")
             return value
         except ValueError:
-            print("Ошибка: введите время в формате HH:MM " "(например, 10:00).")
+            print(
+                "Ошибка: введите время в формате HH:MM "
+                "(например, 10:00)."
+            )

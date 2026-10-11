@@ -1,99 +1,121 @@
-"""Модуль работы с переговорными комнатами."""
+"""Функции работы с переговорными комнатами."""
+
+from models import Room
 
 
-def add_room(rooms: dict[int, dict], room_name: str, capacity: int, equipment: list[str]) -> None:
-    """Добавить новую переговорную комнату в словарь rooms.
+def add_room(
+    rooms: list[Room],
+    room_name: str,
+    capacity: int,
+    equipment: list[str],
+) -> Room:
+    """Добавить новую переговорную в список rooms.
 
     Args:
-        rooms: Словарь переговорных комнат.
-        room_name: Название переговорной.
-        capacity: Вместимость переговорной.
+        rooms: Список переговорных.
+        room_name: Название.
+        capacity: Вместимость.
         equipment: Список оборудования.
-    """
-    new_id = max(rooms.keys()) + 1 if rooms else 1
-    rooms[new_id] = {"name": room_name, "capacity": capacity, "equipment": equipment}
-
-
-def find_room(rooms: dict[int, dict], query: str) -> list[dict]:
-    """Найти переговорные, в названии которых встречается подстрока query.
-
-    Args:
-        rooms: Словарь переговорных комнат.
-        query: Подстрока для поиска (нечувствительна к регистру).
 
     Returns:
-        Список найденных словарей с данными переговорных.
+        Созданный объект Room.
+    """
+    new_id = max((room.id for room in rooms), default=0) + 1
+    room = Room(new_id, room_name, capacity, equipment)
+    rooms.append(room)
+    return room
+
+
+def get_room_by_id(rooms: list[Room], room_id: int) -> Room | None:
+    """Найти переговорную по идентификатору.
+
+    Args:
+        rooms: Список переговорных.
+        room_id: Идентификатор комнаты.
+
+    Returns:
+        Объект Room или None, если комната не найдена.
+    """
+    for room in rooms:
+        if room.id == room_id:
+            return room
+    return None
+
+
+def find_room(rooms: list[Room], query: str) -> list[Room]:
+    """Найти переговорные по подстроке названия.
+
+    Args:
+        rooms: Список переговорных.
+        query: Подстрока поиска, без учёта регистра.
+
+    Returns:
+        Список подходящих комнат.
     """
     query_lower = query.lower()
-    return [
-        {"id": room_id, **room_data}
-        for room_id, room_data in rooms.items()
-        if query_lower in room_data["name"].lower()
-    ]
+    return [room for room in rooms if query_lower in room.name.lower()]
 
 
-def check_room_capacity(rooms: dict[int, dict], room_id: int, min_capacity: int) -> bool:
-    """Проверить, вмещает ли комната room_id не менее min_capacity человек.
+def check_room_capacity(
+    rooms: list[Room],
+    room_id: int,
+    min_capacity: int,
+) -> bool:
+    """Проверить вместимость комнаты room_id.
 
     Args:
-        rooms: Словарь переговорных комнат.
-        room_id: ID переговорной.
-        min_capacity: Минимально требуемая вместимость.
+        rooms: Список переговорных.
+        room_id: Идентификатор комнаты.
+        min_capacity: Минимальное число мест.
 
     Returns:
-        True, если вместимость >= min_capacity, иначе False.
+        True, если комната есть и подходит по вместимости.
     """
-    if room_id not in rooms:
+    room = get_room_by_id(rooms, room_id)
+    if room is None:
         return False
-    return rooms[room_id]["capacity"] >= min_capacity
+    return room.is_suitable_for(min_capacity)
 
 
-def filter_rooms_by_capacity(rooms: dict[int, dict], min_capacity: int) -> list[dict]:
-    """Отобрать переговорные с вместимостью не менее min_capacity.
-
-    Args:
-        rooms: Словарь переговорных комнат.
-        min_capacity: Минимально требуемая вместимость.
-
-    Returns:
-        Список подходящих переговорных с их данными.
-    """
-    return [
-        {"id": room_id, **room_data}
-        for room_id, room_data in rooms.items()
-        if room_data["capacity"] >= min_capacity
-    ]
-
-
-def filter_rooms_by_equipment(rooms: dict[int, dict], required: list[str]) -> list[dict]:
-    """Отобрать переговорные, в которых есть всё оборудование из required.
+def filter_rooms_by_capacity(
+    rooms: list[Room],
+    min_capacity: int,
+) -> list[Room]:
+    """Отобрать переговорные с вместимостью не меньше min_capacity.
 
     Args:
-        rooms: Словарь переговорных комнат.
-        required: Список требуемого оборудования.
+        rooms: Список переговорных.
+        min_capacity: Минимальное число мест.
 
     Returns:
-        Список подходящих переговорных с их данными.
+        Список подходящих комнат.
     """
-    required_lower = [item.lower() for item in required]
-    return [
-        {"id": room_id, **room_data}
-        for room_id, room_data in rooms.items()
-        if all(req in [eq.lower() for eq in room_data["equipment"]] for req in required_lower)
-    ]
+    return [room for room in rooms if room.is_suitable_for(min_capacity)]
 
 
-def sort_rooms(rooms: dict[int, dict]) -> list[dict]:
-    """Отсортировать переговорные по вместимости (по убыванию).
+def filter_rooms_by_equipment(
+    rooms: list[Room],
+    required: list[str],
+) -> list[Room]:
+    """Отобрать переговорные с нужным оборудованием.
 
     Args:
-        rooms: Словарь переговорных комнат.
+        rooms: Список переговорных.
+        required: Требуемое оборудование.
 
     Returns:
-        Отсортированный список переговорных с их данными.
+        Список подходящих комнат.
     """
-    return sorted(
-        [{"id": room_id, **room_data} for room_id, room_data in rooms.items()],
-        key=lambda x: x["capacity"],
-        reverse=True,
-    )
+    return [room for room in rooms if room.has_equipment(required)]
+
+
+def sort_rooms(rooms: list[Room]) -> list[Room]:
+    """Отсортировать переговорные по вместимости по убыванию.
+
+    Args:
+        rooms: Список переговорных.
+
+    Returns:
+        Новый список, отсортированный по capacity.
+    """
+    return sorted(rooms, key=lambda room: room.capacity, reverse=True)

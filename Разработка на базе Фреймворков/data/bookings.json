@@ -2,19 +2,21 @@
   {
     "id": 1,
     "room_id": 1,
-    "date": "2026-09-29",
+    "user_id": 1,
+    "booking_date": "2026-09-29",
     "start_time": "10:00",
     "end_time": "11:30",
-    "organizer": "Иванов И.И.",
-    "topic": "Планёрка отдела разработки"
+    "topic": "Планёрка отдела разработки",
+    "is_cancelled": false
   },
   {
     "id": 2,
     "room_id": 1,
-    "date": "2026-02-23",
+    "user_id": 2,
+    "booking_date": "2026-02-23",
     "start_time": "12:12",
     "end_time": "14:05",
-    "organizer": "Михаил",
-    "topic": "ПРИМЕР1"
+    "topic": "ПРИМЕР1",
+    "is_cancelled": false
   }
 ]

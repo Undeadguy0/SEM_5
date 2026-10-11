@@ -41,10 +41,7 @@ def show_rooms(rooms: list[Room]) -> None:
         print("Переговорных комнат нет.")
         return
 
-    print(
-        f"{'ID':<4} {'Название':<30} "
-        f"{'Вместимость':<12} Оборудование"
-    )
+    print(f"{'ID':<4} {'Название':<30} " f"{'Вместимость':<12} Оборудование")
     print("-" * 70)
     for room in rooms:
         if room.equipment:
@@ -188,11 +185,7 @@ def menu_find_by_capacity(rooms: list[Room]) -> None:
 def menu_find_by_equipment(rooms: list[Room]) -> None:
     """Найти переговорные по оборудованию."""
     query = input("Введите оборудование через запятую: ").strip()
-    required = [
-        item.strip()
-        for item in query.split(",")
-        if item.strip()
-    ]
+    required = [item.strip() for item in query.split(",") if item.strip()]
     results = filter_rooms_by_equipment(rooms, required)
     print(f"\nНайдено: {len(results)}")
     if results:

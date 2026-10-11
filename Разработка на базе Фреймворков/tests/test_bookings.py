@@ -3,6 +3,7 @@
 from domain.bookings import (
     cancel_booking,
     create_booking,
+    find_booking_by_id,
     find_bookings_by_organizer,
     get_booking_status,
     get_room_schedule,
@@ -147,6 +148,23 @@ def test_cancel_booking_keeps_object():
 
     assert cancel_booking(bookings, 999) is False
     assert len(bookings) == 2
+
+
+def test_find_booking_by_id():
+    bookings: list[Booking] = []
+    room = Room(1, "Альфа", 8)
+    user = User(1, "Иванов И.И.", "ivanov@example.com")
+    created = create_booking(
+        bookings,
+        room,
+        user,
+        "2026-09-29",
+        "10:00",
+        "11:00",
+        "Планёрка",
+    )
+    assert find_booking_by_id(bookings, 1) is created
+    assert find_booking_by_id(bookings, 5) is None
 
 
 def test_get_booking_status():

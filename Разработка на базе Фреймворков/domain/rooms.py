@@ -42,6 +42,19 @@ def get_room_by_id(rooms: list[Room], room_id: int) -> Room | None:
     return None
 
 
+def find_room_by_id(rooms: list[Room], room_id: int) -> Room | None:
+    """Найти помещение по идентификатору.
+
+    Args:
+        rooms: Список помещений.
+        room_id: Идентификатор комнаты.
+
+    Returns:
+        Объект Room или None, если комната не найдена.
+    """
+    return get_room_by_id(rooms, room_id)
+
+
 def find_room(rooms: list[Room], query: str) -> list[Room]:
     """Найти переговорные по подстроке названия.
 

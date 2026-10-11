@@ -147,3 +147,22 @@ def get_room_schedule(
         and booking.is_active()
     ]
     return sorted(schedule, key=lambda item: item.start_time)
+
+
+def find_booking_by_id(
+    bookings: list[Booking],
+    booking_id: int,
+) -> Booking | None:
+    """Найти бронирование по идентификатору.
+
+    Args:
+        bookings: Список бронирований.
+        booking_id: Идентификатор бронирования.
+
+    Returns:
+        Объект Booking или None, если запись не найдена.
+    """
+    for booking in bookings:
+        if booking.id == booking_id:
+            return booking
+    return None

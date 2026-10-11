@@ -52,11 +52,14 @@ def test_users_roundtrip(tmp_path):
 def test_load_missing_files(tmp_path):
     assert load_rooms(str(tmp_path / "no-rooms.json")) == []
     assert load_users(str(tmp_path / "no-users.json")) == []
-    assert load_bookings(
-        str(tmp_path / "no-bookings.json"),
-        [],
-        [],
-    ) == []
+    assert (
+        load_bookings(
+            str(tmp_path / "no-bookings.json"),
+            [],
+            [],
+        )
+        == []
+    )
 
 
 def test_load_broken_json(tmp_path):

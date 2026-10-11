@@ -1,14 +1,15 @@
 """Тесты для модуля rooms.py."""
 
-from models import Room
 from domain.rooms import (
     add_room,
     check_room_capacity,
     filter_rooms_by_capacity,
     filter_rooms_by_equipment,
     find_room,
+    find_room_by_id,
     sort_rooms,
 )
+from models import Room
 
 
 def test_add_room():
@@ -26,6 +27,13 @@ def test_add_room_assigns_next_id():
     created = add_room(rooms, "Новая", 5, [])
     assert created.id == 4
     assert len(rooms) == 2
+
+
+def test_find_room_by_id():
+    rooms: list[Room] = []
+    add_room(rooms, "Альфа", 8, [])
+    assert find_room_by_id(rooms, 1) is rooms[0]
+    assert find_room_by_id(rooms, 5) is None
 
 
 def test_find_room():

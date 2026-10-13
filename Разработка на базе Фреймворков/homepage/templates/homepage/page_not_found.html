@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block title %}Не найдено{% endblock %}
+
+{% block content %}
+<h1 class="display-4">Страница не найдена</h1>
+<p class="lead">Запрошенный адрес не существует.</p>
+<a class="btn btn-primary" href="{% url 'homepage:index' %}">На главную</a>
+{% endblock %}

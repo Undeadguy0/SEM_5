@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Помещения{% endblock %}
+
+{% block content %}
+<h1 class="display-4">Помещения</h1>
+<p class="lead">Все переговорные комнаты офиса. Всего: {{ rooms|length }}.</p>
+<div class="list-group">
+    {% for room in rooms %}
+        {% include "rooms/includes/room_card.html" %}
+    {% empty %}
+        <p class="lead">Помещений пока нет.</p>
+    {% endfor %}
+</div>
+{% endblock %}

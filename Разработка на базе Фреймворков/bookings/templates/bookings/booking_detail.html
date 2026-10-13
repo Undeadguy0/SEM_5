@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Бронирование #{{ booking.id }}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <h1 class="display-4">Бронирование #{{ booking.id }}</h1>
+        <p class="lead">{{ booking.topic|default:"Без темы" }}</p>
+        <ul class="list-group list-group-flush mb-3">
+            <li class="list-group-item">Помещение:
+                <a href="{% url 'rooms:detail' booking.room.id %}">{{ booking.room.name|default:"Без названия" }}</a>
+            </li>
+            <li class="list-group-item">Организатор:
+                {{ booking.user.name }}, {{ booking.user.email }}
+            </li>
+            <li class="list-group-item">Дата: {{ booking.booking_date }}</li>
+            <li class="list-group-item">Время:
+                {{ booking.start_time }}–{{ booking.end_time }}
+            </li>
+            <li class="list-group-item">Статус:
+                {% include "bookings/includes/booking_status.html" %}
+            </li>
+        </ul>
+        <a class="btn btn-primary" href="{% url 'bookings:bookings' %}">К списку бронирований</a>
+    </div>
+</div>
+{% endblock %}

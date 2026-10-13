@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Бронирования{% endblock %}
+
+{% block content %}
+<h1 class="display-4">Бронирования</h1>
+<p class="lead">Все записи, включая отменённые. Всего: {{ bookings|length }}.</p>
+<div class="list-group">
+    {% for booking in bookings %}
+        <a class="list-group-item list-group-item-action" href="{% url 'bookings:detail' booking.id %}">
+            <strong>#{{ booking.id }} {{ booking.room.name|default:"Без названия" }}</strong>
+            {{ booking.booking_date }}
+            {{ booking.start_time }}–{{ booking.end_time }}
+            {{ booking.user.name }}
+            {% include "bookings/includes/booking_status.html" %}
+        </a>
+    {% empty %}
+        <p class="lead">Бронирований пока нет.</p>
+    {% endfor %}
+</div>
+{% endblock %}

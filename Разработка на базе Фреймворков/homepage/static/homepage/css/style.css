@@ -1,0 +1,20 @@
+.roomly-logo {
+    width: 32px;
+    height: 32px;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+}
+
+.room-card {
+    border-radius: 0.5rem;
+}
+
+.room-card .badge,
+.booking-status {
+    margin-left: 0.35rem;
+    font-weight: 600;
+}
+
+.roomly-footer {
+    color: #6c757d;
+}

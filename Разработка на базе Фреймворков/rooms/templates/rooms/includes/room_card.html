@@ -1,0 +1,11 @@
+<a class="list-group-item list-group-item-action room-card" href="{% url 'rooms:detail' room.id %}">
+    <strong>{{ room.name|default:"Без названия" }}</strong>
+    <span class="badge bg-secondary">{{ room.capacity }} мест</span>
+    <div class="text-body-secondary">
+        {% if room.equipment %}
+            {% for item in room.equipment %}{{ item }}{% if not forloop.last %}, {% endif %}{% endfor %}
+        {% else %}
+            нет
+        {% endif %}
+    </div>
+</a>

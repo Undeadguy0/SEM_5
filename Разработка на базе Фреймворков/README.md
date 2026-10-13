@@ -25,7 +25,24 @@
 
 Неизвестный адрес обрабатывает `homepage.views.page_not_found` и возвращает статус 404. Если помещение или бронирование не найдены, карточка тоже отвечает статусом 404.
 
-Страницы собирает функция `page()`: общая вёрстка, кодировка UTF-8, метатег viewport, Bootstrap 5.3 с CDN и навигация. Карточка помещения показывает, свободна ли комната сегодня: для этого вызывается `is_room_available()` из консольного приложения.
+Страницы рисуют шаблоны Django. Общий каркас — `templates/base.html`: блоки `title` и `content`, кодировка UTF-8, метатег viewport, Bootstrap 5.3 с CDN, свои CSS, JavaScript и логотип. Навигация подключена через `{% include "includes/navigation.html" %}`. Ссылки собраны тегом `{% url %}` с пространствами имён `homepage`, `rooms` и `bookings`.
+
+Списки обходят контекст циклом `{% for %}`, пустую коллекцию обрабатывает `{% empty %}`. Статус бронирования и доступность комнаты на сегодня выводятся через `{% if %}`. Число записей показывает фильтр `length`, пустое название — фильтр `default`. Карточка помещения — `rooms/includes/room_card.html`, значок статуса — `bookings/includes/booking_status.html`. Доступность на сегодня считает `is_room_available()`, текст статуса — `get_booking_status()`. Год в подвале подставляет `main.js`.
+
+View-функции передают данные словарём контекста в `render()`. HTML в Python больше не собирается.
+
+## Шаблоны и статические файлы
+
+- `templates/base.html` — базовый шаблон, `{% extends %}` и `{% block %}`;
+- `templates/includes/navigation.html` — общее меню;
+- `homepage/templates/homepage/` — главная и страницы 404;
+- `rooms/templates/rooms/room_list.html`, `room_detail.html`;
+- `rooms/templates/rooms/includes/room_card.html` — карточка одного помещения;
+- `bookings/templates/bookings/booking_list.html`, `booking_detail.html`;
+- `bookings/templates/bookings/includes/booking_status.html` — активно или отменено;
+- `homepage/static/homepage/css/style.css` — стили `.room-card`, `.booking-status`, `.roomly-logo`;
+- `homepage/static/homepage/js/main.js` — текущий год в `#current-year`;
+- `homepage/static/homepage/img/logo.png` — логотип.
 
 ## Классы
 
@@ -41,7 +58,8 @@
 
 - `main.py` — консольное меню;
 - `manage.py`, `roomly/` — проект Django;
-- `homepage/`, `rooms/`, `bookings/` — приложения сайта;
+- `homepage/`, `rooms/`, `bookings/` — приложения сайта, их шаблоны и статика;
+- `templates/` — базовый шаблон и общая навигация;
 - `models/` — классы `Room`, `User`, `Booking`;
 - `domain/rooms.py`, `domain/bookings.py` — функции предметной области;
 - `users.py` — функции работы с пользователями;
@@ -82,6 +100,8 @@ python manage.py runserver
 ```
 
 Главная страница: http://127.0.0.1:8000/
+
+Сайт показывает помещения и бронирования из JSON. Страницы собраны шаблонами Django: базовый шаблон, наследование, include, контекст и статические файлы. Django ORM, формы и операции создания через сайт на этом этапе не используются.
 
 ## Запуск консольной программы
 

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}{{ room.name|default:"Без названия" }}{% endblock %}
+
+{% block content %}
+<div class="card room-card">
+    <div class="card-body">
+        <h1 class="display-4">{{ room.name|default:"Без названия" }}</h1>
+        <p class="lead">Вместимость: {{ room.capacity }} мест.</p>
+        <ul class="list-group list-group-flush mb-3">
+            <li class="list-group-item">Оборудование:
+                {% if room.equipment %}
+                    {% for item in room.equipment %}{{ item }}{% if not forloop.last %}, {% endif %}{% endfor %}
+                {% else %}
+                    нет
+                {% endif %}
+            </li>
+            <li class="list-group-item">На сегодня ({{ today }}):
+                {% if available %}
+                    <span class="badge bg-success">{{ status }}</span>
+                {% else %}
+                    <span class="badge bg-danger">{{ status }}</span>
+                {% endif %}
+            </li>
+        </ul>
+        <a class="btn btn-primary" href="{% url 'rooms:list' %}">К списку помещений</a>
+    </div>
+</div>
+{% endblock %}

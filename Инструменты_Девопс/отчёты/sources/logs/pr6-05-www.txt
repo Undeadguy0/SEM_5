@@ -1,0 +1,9 @@
+$ ls -la /var/www/devops-site/
+total 16
+drwxr-xr-x 2 devops devops 4096 Oct 27 08:54 .
+drwxr-xr-x 4 root   root   4096 Oct 27 08:39 ..
+-rw-r--r-- 1 devops devops  204 Oct 27 08:45 404.html
+-rw-r--r-- 1 devops devops  376 Oct 27 08:53 index.html
+
+$ find /var/www/devops-site -perm -o+w
+(empty find = OK)

@@ -1,0 +1,4 @@
+Deploy scenarios (table 10): dry-run / note
+Local stub ~/devops-course-2026 has audit.sh only; full deploy.sh lives in course tree on host.
+Production site already deployed (snapshot 04-nginx-https-T6). Skipping destructive stop-nginx scenarios.
+deploy.sh: not present in VM stub — not re-run (avoid breaking site).

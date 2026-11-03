@@ -1,0 +1,4 @@
+$ curl.exe -m 3 --resolve api.devops.local:8001:127.0.0.1 http://api.devops.local:8001/health
+curl: (7) Failed to connect to api.devops.local port 8001 after 2001 ms: Could not connect to server
+
+EXIT:7 (connection refused / not published — OK for lab)

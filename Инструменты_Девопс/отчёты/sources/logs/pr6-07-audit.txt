@@ -1,0 +1,19 @@
+$ (cd ~/devops-course-2026 && scripts/audit.sh); echo $?
+=== [4] Веб-сервер ===
+[OK] nginx active
+[OK] nginx config OK
+[OK] cert valid >= 30 days
+[OK] no world-writable in site & key mode 600
+=== [5] Контейнеризация ===
+[OK] docker active
+[OK] db container healthy
+[OK] ports 5000/5432 only localhost
+[OK] .env mode 600
+=== [6] Контрольная работа № 2 ===
+[OK] kr2 redis healthy
+[OK] kr2 app port only 127.0.0.1
+[OK] kr2 .env mode 600
+[OK] kr2 cert valid >= 30 days
+[OK] kr2 site enabled
+AUDIT_OK
+EXIT:0

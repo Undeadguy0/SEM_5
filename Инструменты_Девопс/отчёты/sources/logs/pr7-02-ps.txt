@@ -1,0 +1,4 @@
+$ docker compose ps
+NAME        IMAGE                COMMAND                  SERVICE   CREATED       STATUS                 PORTS
+app-app-1   devops-app:1.0       "gunicorn --bind 0.0…"   app       5 hours ago   Up 5 hours             127.0.0.1:5000->5000/tcp
+app-db-1    postgres:16-alpine   "docker-entrypoint.s…"   db        5 hours ago   Up 5 hours (healthy)   5432/tcp

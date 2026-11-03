@@ -1,0 +1,2 @@
+$ curl.exe --cacert ~/kr2.crt --resolve api.devops.local:443:127.0.0.1 https://api.devops.local/
+KR2 | Kisliy | container 2a6daa151711 | hits: 13

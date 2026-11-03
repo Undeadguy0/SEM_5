@@ -1,0 +1,7 @@
+$ curl.exe -I --resolve api.devops.local:443:127.0.0.1 https://api.devops.local/   # no cacert
+curl: (60) schannel: SEC_E_UNTRUSTED_ROOT (0x80090325) - ╓хяюўър ёхЁЄшЇшърЄют т√яє∙хэр ЎхэЄЁюь ёхЁЄшЇшърЎшш, эх шьх■∙шь фютхЁш .
+More details here: https://curl.se/docs/sslcerts.html
+System.Management.Automation.RemoteException
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.

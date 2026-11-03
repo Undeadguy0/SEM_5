@@ -1,0 +1,5 @@
+$ git ls-files | grep -E '\.env' || echo '(no .env tracked — OK)'
+(no .env tracked in course repo — OK)
+
+$ ls -l ~/app/.env
+-rw------- 1 devops devops 96 Oct 27 09:01 /home/devops/app/.env

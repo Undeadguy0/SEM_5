@@ -1,0 +1,11 @@
+﻿$ VBoxManage snapshot devops-vm list
+   Name: 01-clean-install (UUID: 50cd45b6-c252-4aea-bee7-54f44f087c85)
+      Name: 04-nginx-https-T6 (UUID: e75c8027-563c-4026-a0b9-cb2abe5cbd56)
+      Description: DEV_6: nginx HTTPS, devops.local, rsync/deploy/audit OK
+         Name: 05-docker-compose-T7 (UUID: 62c6d012-b17b-4603-876e-5767ae60b562)
+         Description: DEV_7: Docker CE, compose app+db, nginx /app/ proxy, audit [5]
+            Name: 06-before-kr2 (UUID: 4849660b-1e34-468f-bb6e-06d6fd0033a6)
+            Description: KR2 start: state after DEV_7 before control work
+               Name: 07-kr2-TKR2 (UUID: 26c1ffa5-d4e4-4d79-9abe-d7b00d953aff) *
+               Description: KR2 / T-KR2 complete: api.devops.local + Redis + audit[6]
+

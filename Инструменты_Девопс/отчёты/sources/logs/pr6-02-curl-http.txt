@@ -1,0 +1,9 @@
+$ curl.exe -I --resolve devops.local:80:127.0.0.1 http://devops.local/
+HTTP/1.1 301 Moved Permanently
+Server: nginx/1.30.4 (Ubuntu)
+Date: Tue, 27 Oct 2026 14:11:54 GMT
+Content-Type: text/html
+Content-Length: 178
+Connection: keep-alive
+Location: https://devops.local/
+

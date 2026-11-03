@@ -1,0 +1,7 @@
+$ openssl s_client / x509 SAN for api.devops.local
+X509v3 Subject Alternative Name: 
+    DNS:api.devops.local
+
+$ openssl x509 -in ~/kr2.crt -noout -ext subjectAltName
+X509v3 Subject Alternative Name: 
+    DNS:api.devops.local

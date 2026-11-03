@@ -1,0 +1,10 @@
+$ sudo nginx -t
+nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+nginx: configuration file /etc/nginx/nginx.conf test is successful
+
+$ ls -la /etc/nginx/sites-enabled/
+total 8
+drwxr-xr-x 2 root root 4096 Oct 27 09:15 .
+drwxr-xr-x 8 root root 4096 Oct 27 08:39 ..
+lrwxrwxrwx 1 root root   38 Oct 27 08:39 devops-site -> /etc/nginx/sites-available/devops-site
+lrwxrwxrwx 1 root root   30 Oct 27 09:15 kr2 -> /etc/nginx/sites-available/kr2

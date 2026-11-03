@@ -1,0 +1,20 @@
+$ curl.exe --cacert ~/devops.crt -I --resolve devops.local:443:127.0.0.1 https://devops.local/
+HTTP/1.1 200 OK
+Server: nginx/1.30.4 (Ubuntu)
+Date: Tue, 27 Oct 2026 14:12:36 GMT
+Content-Type: text/html
+Content-Length: 376
+Last-Modified: Tue, 27 Oct 2026 08:53:56 GMT
+Connection: keep-alive
+ETag: "6ae066a4-178"
+Accept-Ranges: bytes
+
+
+$ curl.exe --cacert ~/devops.crt -I --resolve devops.local:443:127.0.0.1 https://devops.local/app/
+HTTP/1.1 200 OK
+Server: nginx/1.30.4 (Ubuntu)
+Date: Tue, 27 Oct 2026 14:12:36 GMT
+Content-Type: text/html; charset=utf-8
+Content-Length: 38
+Connection: keep-alive
+

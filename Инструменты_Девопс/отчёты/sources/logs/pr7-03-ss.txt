@@ -1,0 +1,12 @@
+$ sudo ss -tlnp
+State  Recv-Q Send-Q Local Address:Port Peer Address:PortProcess
+LISTEN 0      511          0.0.0.0:80        0.0.0.0:*    users:(("nginx",pid=14118,fd=7),("nginx",pid=14117,fd=7),("nginx",pid=5956,fd=7))
+LISTEN 0      128          0.0.0.0:2222      0.0.0.0:*    users:(("sshd",pid=1017,fd=6))
+LISTEN 0      4096      127.0.0.54:53        0.0.0.0:*    users:(("systemd-resolve",pid=58416,fd=20))
+LISTEN 0      4096       127.0.0.1:5000      0.0.0.0:*    users:(("docker-proxy",pid=11052,fd=8))
+LISTEN 0      511          0.0.0.0:443       0.0.0.0:*    users:(("nginx",pid=14118,fd=9),("nginx",pid=14117,fd=9),("nginx",pid=5956,fd=9))
+LISTEN 0      4096       127.0.0.1:8001      0.0.0.0:*    users:(("docker-proxy",pid=14785,fd=8))
+LISTEN 0      4096   127.0.0.53%lo:53        0.0.0.0:*    users:(("systemd-resolve",pid=58416,fd=18))
+LISTEN 0      511             [::]:80           [::]:*    users:(("nginx",pid=14118,fd=8),("nginx",pid=14117,fd=8),("nginx",pid=5956,fd=8))
+LISTEN 0      128             [::]:2222         [::]:*    users:(("sshd",pid=1017,fd=7))
+LISTEN 0      511             [::]:443          [::]:*    users:(("nginx",pid=14118,fd=10),("nginx",pid=14117,fd=10),("nginx",pid=5956,fd=10))

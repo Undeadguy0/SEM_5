@@ -1,0 +1,4 @@
+$ curl.exe --cacert ~/kr2.crt --resolve api.devops.local:443:127.0.0.1 https://api.devops.local/whoami
+scheme: https
+client: 10.0.2.2
+host: api.devops.local

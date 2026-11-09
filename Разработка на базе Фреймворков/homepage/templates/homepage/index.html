@@ -4,10 +4,11 @@
 
 {% block content %}
 <h1 class="display-4">Система бронирования переговорных</h1>
-<p class="lead">Веб-интерфейс показывает помещения и бронирования из JSON-файлов консольного приложения.</p>
-<p>Создание и отмена бронирований пока выполняются в консольной программе <code>python main.py</code>.</p>
+<p class="lead">Веб-интерфейс читает помещения и бронирования из SQLite. В базе {{ rooms_count }} помещений и {{ bookings_count }} активных бронирований.</p>
+<p>Создание и отмена бронирований пока выполняются в консольной программе <code>python main.py</code>. Консоль по-прежнему хранит данные в JSON.</p>
 <p class="mt-4">
     <a class="btn btn-primary me-2" href="{% url 'rooms:list' %}">Список помещений</a>
-    <a class="btn btn-primary" href="{% url 'bookings:bookings' %}">Список бронирований</a>
+    <a class="btn btn-primary me-2" href="{% url 'bookings:bookings' %}">Список бронирований</a>
+    <a class="btn btn-primary" href="{% url 'bookings:statistics' %}">Статистика</a>
 </p>
 {% endblock %}

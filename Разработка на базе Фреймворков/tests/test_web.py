@@ -17,6 +17,7 @@ def test_index_has_navigation():
     text = response.content.decode()
     assert response.status_code == 200
     assert "Система бронирования переговорных" in text
+    assert "Статистика" in text
     assert 'class="nav"' in text
     assert 'class="btn btn-primary' in text
     assert 'name="viewport"' in text
@@ -28,6 +29,7 @@ def test_room_list_and_detail():
     listing_text = listing.content.decode()
     assert listing.status_code == 200
     assert "Переговорная «Альфа»" in listing_text
+    assert "Найти свободное помещение" in listing_text
     assert "list-group" in listing_text
 
     detail = client.get("/rooms/1/")
@@ -63,6 +65,31 @@ def test_booking_list_and_detail():
     missing = client.get("/bookings/999/")
     assert missing.status_code == 404
     assert "Бронирование не найдено." in missing.content.decode()
+
+
+def test_available_rooms_by_date():
+    client = _client()
+    form = client.get("/rooms/available/")
+    form_text = form.content.decode()
+    assert form.status_code == 200
+    assert "Свободные помещения" in form_text
+    assert 'name="date"' in form_text
+
+    found = client.get("/rooms/available/?date=2026-09-29")
+    found_text = found.content.decode()
+    assert found.status_code == 200
+    assert "Переговорная «Альфа»" not in found_text
+    assert "Переговорная «Гамма»" in found_text
+
+
+def test_statistics_page():
+    response = _client().get("/bookings/statistics/")
+    text = response.content.decode()
+    assert response.status_code == 200
+    assert "Статистика бронирований" in text
+    assert "Переговорная «Альфа»" in text
+    assert "Количество бронирований: 2" in text
+    assert "Иванов И.И." in text
 
 
 @override_settings(DEBUG=False)

@@ -5,11 +5,22 @@
 {% block content %}
 <h1 class="display-4">Помещения</h1>
 <p class="lead">Все переговорные комнаты офиса. Всего: {{ rooms|length }}.</p>
+<p>
+    <a href="{% url 'rooms:available' %}">Найти свободное помещение</a>
+</p>
 <div class="list-group">
     {% for room in rooms %}
         {% include "rooms/includes/room_card.html" %}
     {% empty %}
         <p class="lead">Помещений пока нет.</p>
+    {% endfor %}
+</div>
+<h2 class="h4 mt-4">Вместимость от 8 мест</h2>
+<div class="list-group">
+    {% for room in large_rooms %}
+        {% include "rooms/includes/room_card.html" %}
+    {% empty %}
+        <p class="lead">Таких помещений нет.</p>
     {% endfor %}
 </div>
 {% endblock %}

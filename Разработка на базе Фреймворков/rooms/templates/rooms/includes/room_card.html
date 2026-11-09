@@ -3,7 +3,7 @@
     <span class="badge bg-secondary">{{ room.capacity }} мест</span>
     <div class="text-body-secondary">
         {% if room.equipment %}
-            {% for item in room.equipment %}{{ item }}{% if not forloop.last %}, {% endif %}{% endfor %}
+            {{ room.equipment }}
         {% else %}
             нет
         {% endif %}

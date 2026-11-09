@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Статистика{% endblock %}
+
+{% block content %}
+<h1 class="display-4">Статистика бронирований</h1>
+<p class="lead">Активных бронирований: {{ bookings_count }}.</p>
+<p>
+    Помещений: {{ summary.rooms_count }}.
+    Средняя вместимость: {{ summary.average_capacity|floatformat:1 }}.
+    Максимальная вместимость: {{ summary.max_capacity }}.
+</p>
+<h2 class="h4">По помещениям</h2>
+<div class="list-group mb-4">
+    {% for item in statistics %}
+        <article class="list-group-item statistics-item">
+            <h3 class="h5">{{ item.room_name|default:"Без названия" }}</h3>
+            <p class="mb-0">Количество бронирований: {{ item.bookings_count }}</p>
+        </article>
+    {% empty %}
+        <p class="lead">Данные отсутствуют.</p>
+    {% endfor %}
+</div>
+<h2 class="h4">Больше одного бронирования</h2>
+<div class="list-group mb-4">
+    {% for item in popular %}
+        <article class="list-group-item statistics-item">
+            <h3 class="h5">{{ item.room_name|default:"Без названия" }}</h3>
+            <p class="mb-0">Количество бронирований: {{ item.bookings_count }}</p>
+        </article>
+    {% empty %}
+        <p class="lead">Таких помещений нет.</p>
+    {% endfor %}
+</div>
+<h2 class="h4">По организаторам</h2>
+<div class="list-group mb-4">
+    {% for item in by_user %}
+        <article class="list-group-item statistics-item">
+            <h3 class="h5">{{ item.user_name }}</h3>
+            <p class="mb-0">Количество бронирований: {{ item.bookings_count }}</p>
+        </article>
+    {% empty %}
+        <p class="lead">Данные отсутствуют.</p>
+    {% endfor %}
+</div>
+<h2 class="h4">Пользователи</h2>
+<ul class="list-group">
+    {% for user in users %}
+        <li class="list-group-item">{{ user.name }}, {{ user.email }}</li>
+    {% empty %}
+        <li class="list-group-item">Пользователей нет.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

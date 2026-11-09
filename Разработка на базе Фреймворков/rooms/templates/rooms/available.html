@@ -20,7 +20,10 @@
         <button type="submit" class="btn btn-primary">Найти</button>
     </div>
 </form>
-{% if booking_date %}
+{% if error %}
+    <p class="text-danger">{{ error }}</p>
+{% endif %}
+{% if booking_date and not error %}
     <h2 class="h4">Дата: {{ booking_date }}</h2>
     <div class="list-group">
         {% for room in rooms %}

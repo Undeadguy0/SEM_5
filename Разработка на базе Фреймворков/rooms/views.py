@@ -1,87 +1,76 @@
 """Страницы помещений."""
 
-from contextlib import closing
 from datetime import date
+from datetime import datetime
 
-from django.http import HttpRequest, HttpResponse
+from django.db.models import Q
+from django.http import Http404
+from django.http import HttpRequest
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 
-from db.database import get_connection
+from bookings.models import Booking
 from domain.bookings import get_booking_status
 from homepage.views import http_not_found
+from rooms.models import Room
+
+
+def _matching_rooms(query: str):
+    """Отобрать помещения по названию или оборудованию.
+
+    Args:
+        query: Подстрока поиска. Пустая строка оставляет все записи.
+
+    Returns:
+        QuerySet помещений.
+    """
+    rooms = Room.objects.order_by("name")
+    if not query:
+        return rooms
+    return rooms.filter(
+        Q(name__icontains=query) | Q(equipment__icontains=query),
+    )
 
 
 def rooms(request: HttpRequest) -> HttpResponse:
-    """Показать список помещений и отбор по вместимости."""
-    with closing(get_connection()) as connection:
-        room_list = connection.execute(
-            """
-            SELECT
-                id,
-                name,
-                capacity,
-                equipment
-            FROM rooms
-            ORDER BY name;
-            """
-        ).fetchall()
-        large_rooms = connection.execute(
-            """
-            SELECT
-                id,
-                name,
-                capacity,
-                equipment
-            FROM rooms
-            WHERE capacity >= ?
-            ORDER BY capacity;
-            """,
-            (8,),
-        ).fetchall()
+    """Показать помещения и отбор по вместимости."""
+    query = request.GET.get("q", "").strip()
+    room_list = _matching_rooms(query)
+    large_rooms = (
+        _matching_rooms(query)
+        .filter(capacity__gte=8)
+        .order_by("capacity")
+    )
     context = {
         "rooms": room_list,
         "large_rooms": large_rooms,
+        "query": query,
     }
     return render(request, "rooms/room_list.html", context)
 
 
 def room_detail(request: HttpRequest, room_id: int) -> HttpResponse:
     """Показать карточку помещения и доступность на сегодня."""
-    with closing(get_connection()) as connection:
-        room = connection.execute(
-            """
-            SELECT
-                id,
-                name,
-                capacity,
-                equipment
-            FROM rooms
-            WHERE id = ?;
-            """,
-            (room_id,),
-        ).fetchone()
-        if room is None:
-            return http_not_found(
-                request,
-                "Помещение не найдено.",
-                "rooms:list",
-                "К списку помещений",
-            )
-        today = date.today().isoformat()
-        occupied = connection.execute(
-            """
-            SELECT COUNT(*) AS occupied
-            FROM bookings
-            WHERE room_id = ?
-                AND booking_date = ?
-                AND is_cancelled = 0;
-            """,
-            (room_id, today),
-        ).fetchone()
-    available = occupied["occupied"] == 0
+    try:
+        room = get_object_or_404(Room, pk=room_id)
+    except Http404:
+        return http_not_found(
+            request,
+            "Помещение не найдено.",
+            "rooms:list",
+            "К списку помещений",
+        )
+    today = date.today()
+    occupied = Booking.objects.filter(
+        room=room,
+        booking_date=today,
+        is_cancelled=False,
+    ).count()
+    available = occupied == 0
     context = {
         "room": room,
-        "today": today,
+        "today": today.isoformat(),
         "available": available,
         "status": get_booking_status(available),
     }
@@ -90,30 +79,28 @@ def room_detail(request: HttpRequest, room_id: int) -> HttpResponse:
 
 def available_rooms(request: HttpRequest) -> HttpResponse:
     """Найти помещения без активного бронирования на дату."""
-    booking_date = request.GET.get("date") or ""
+    booking_date = request.GET.get("date", "").strip()
     room_list = []
+    error = None
     if booking_date:
-        with closing(get_connection()) as connection:
-            room_list = connection.execute(
-                """
-                SELECT
-                    rooms.id,
-                    rooms.name,
-                    rooms.capacity,
-                    rooms.equipment
-                FROM rooms
-                WHERE rooms.id NOT IN (
-                    SELECT bookings.room_id
-                    FROM bookings
-                    WHERE bookings.booking_date = ?
-                        AND bookings.is_cancelled = 0
-                )
-                ORDER BY rooms.name;
-                """,
-                (booking_date,),
-            ).fetchall()
+        try:
+            selected_date = datetime.strptime(
+                booking_date,
+                "%Y-%m-%d",
+            ).date()
+        except ValueError:
+            error = "Укажите корректную дату."
+        else:
+            booked_room_ids = Booking.objects.filter(
+                booking_date=selected_date,
+                is_cancelled=False,
+            ).values_list("room_id", flat=True)
+            room_list = Room.objects.exclude(
+                pk__in=booked_room_ids,
+            ).order_by("name")
     context = {
         "rooms": room_list,
         "booking_date": booking_date,
+        "error": error,
     }
     return render(request, "rooms/available.html", context)

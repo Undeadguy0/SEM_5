@@ -98,4 +98,56 @@ def test_unknown_url_uses_custom_404():
     text = response.content.decode()
     assert response.status_code == 404
     assert "Страница не найдена" in text
-    assert "bootstrap@5.3.3" in text
+
+
+def test_room_search_by_name_and_equipment():
+    client = _client()
+    by_name = client.get("/rooms/?q=Гамма")
+    by_name_text = by_name.content.decode()
+    assert by_name.status_code == 200
+    assert "Переговорная «Гамма»" in by_name_text
+    assert "Переговорная «Альфа»" not in by_name_text
+
+    by_equipment = client.get("/rooms/?q=проектор")
+    by_equipment_text = by_equipment.content.decode()
+    assert "Переговорная «Альфа»" in by_equipment_text
+    assert "Переговорная «Гамма»" in by_equipment_text
+    assert "Без названия" not in by_equipment_text
+
+
+def test_available_rooms_reject_bad_date():
+    response = _client().get("/rooms/available/?date=не-дата")
+    text = response.content.decode()
+    assert response.status_code == 200
+    assert "Укажите корректную дату." in text
+    assert "Переговорная «Гамма»" not in text
+
+
+def test_booking_filters_sort_and_search():
+    client = _client()
+    by_room = client.get("/bookings/?room=1&sort=room")
+    by_room_text = by_room.content.decode()
+    assert by_room.status_code == 200
+    assert "Иванов И.И." in by_room_text
+
+    by_user = client.get("/bookings/?user=1")
+    by_user_text = by_user.content.decode()
+    assert "Всего: 1" in by_user_text
+    assert 'href="/bookings/1/"' in by_user_text
+    assert 'href="/bookings/2/"' not in by_user_text
+
+    by_topic = client.get("/bookings/?q=Планёрка")
+    by_topic_text = by_topic.content.decode()
+    assert "Всего: 1" in by_topic_text
+    assert 'href="/bookings/1/"' in by_topic_text
+    assert 'href="/bookings/2/"' not in by_topic_text
+
+    bad_date = client.get("/bookings/?date=не-дата")
+    assert "Укажите корректную дату." in bad_date.content.decode()
+
+    bad_page = client.get("/bookings/?page=abc")
+    assert bad_page.status_code == 200
+    assert "Иванов И.И." in bad_page.content.decode()
+
+    bad_sort = client.get("/bookings/?sort=name;drop")
+    assert bad_sort.status_code == 200

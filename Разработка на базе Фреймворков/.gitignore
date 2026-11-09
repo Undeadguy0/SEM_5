@@ -1,6 +1,7 @@
 .venv
 venv
 db.sqlite3
+data/roomly_backup.sqlite
 .odt
 __pycache__/
 .pytest_cache/

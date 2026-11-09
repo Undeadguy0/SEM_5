@@ -1,38 +1,94 @@
 """Страницы бронирований."""
 
-from contextlib import closing
+from datetime import datetime
 
-from django.http import HttpRequest, HttpResponse
+from django.core.paginator import Paginator
+from django.db.models import Avg
+from django.db.models import Count
+from django.db.models import F
+from django.db.models import Max
+from django.db.models import Q
+from django.http import Http404
+from django.http import HttpRequest
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 
-from db.database import get_connection
+from bookings.models import Booking
 from homepage.views import http_not_found
+from rooms.models import Room
+from users.models import User
+
+
+SORT_FIELDS = {
+    "date": "booking_date",
+    "room": "room__name",
+    "user": "user__name",
+}
+PAGE_SIZE = 5
 
 
 def bookings(request: HttpRequest) -> HttpResponse:
-    """Показать активные бронирования с помещением и организатором."""
-    with closing(get_connection()) as connection:
-        booking_list = connection.execute(
-            """
-            SELECT
-                bookings.id,
-                bookings.booking_date,
-                bookings.start_time,
-                bookings.end_time,
-                bookings.topic,
-                bookings.is_cancelled,
-                rooms.name AS room_name,
-                users.name AS user_name
-            FROM bookings
-            JOIN rooms
-                ON bookings.room_id = rooms.id
-            JOIN users
-                ON bookings.user_id = users.id
-            WHERE bookings.is_cancelled = 0
-            ORDER BY bookings.booking_date, bookings.start_time;
-            """
-        ).fetchall()
-    context = {"bookings": booking_list}
+    """Показать активные бронирования с фильтрами и страницами."""
+    booking_date = request.GET.get("date", "").strip()
+    room_id = request.GET.get("room", "").strip()
+    user_id = request.GET.get("user", "").strip()
+    query = request.GET.get("q", "").strip()
+    sort = request.GET.get("sort", "date")
+    error = None
+    if sort not in SORT_FIELDS:
+        sort = "date"
+
+    bookings_data = Booking.objects.filter(is_cancelled=False)
+    if booking_date:
+        try:
+            selected_date = datetime.strptime(
+                booking_date,
+                "%Y-%m-%d",
+            ).date()
+        except ValueError:
+            error = "Укажите корректную дату."
+        else:
+            bookings_data = bookings_data.filter(
+                booking_date=selected_date,
+            )
+    if room_id.isdigit():
+        bookings_data = bookings_data.filter(room_id=int(room_id))
+    if user_id.isdigit():
+        bookings_data = bookings_data.filter(user_id=int(user_id))
+    if query:
+        bookings_data = bookings_data.filter(topic__icontains=query)
+
+    bookings_data = bookings_data.annotate(
+        room_name=F("room__name"),
+        capacity=F("room__capacity"),
+        user_name=F("user__name"),
+    ).order_by(SORT_FIELDS[sort], "id")
+    bookings_data = bookings_data.values(
+        "id",
+        "booking_date",
+        "start_time",
+        "end_time",
+        "topic",
+        "is_cancelled",
+        "room_name",
+        "capacity",
+        "user_name",
+    )
+    paginator = Paginator(bookings_data, PAGE_SIZE)
+    page_obj = paginator.get_page(request.GET.get("page"))
+    context = {
+        "bookings": page_obj,
+        "page_obj": page_obj,
+        "booking_date": booking_date,
+        "selected_room": room_id,
+        "selected_user": user_id,
+        "query": query,
+        "sort": sort,
+        "rooms": Room.objects.order_by("name"),
+        "users": User.objects.order_by("name"),
+        "error": error,
+    }
     return render(request, "bookings/booking_list.html", context)
 
 
@@ -41,30 +97,12 @@ def booking_detail(
     booking_id: int,
 ) -> HttpResponse:
     """Показать карточку одного бронирования."""
-    with closing(get_connection()) as connection:
-        booking = connection.execute(
-            """
-            SELECT
-                bookings.id,
-                bookings.room_id,
-                bookings.booking_date,
-                bookings.start_time,
-                bookings.end_time,
-                bookings.topic,
-                bookings.is_cancelled,
-                rooms.name AS room_name,
-                users.name AS user_name,
-                users.email AS user_email
-            FROM bookings
-            JOIN rooms
-                ON bookings.room_id = rooms.id
-            JOIN users
-                ON bookings.user_id = users.id
-            WHERE bookings.id = ?;
-            """,
-            (booking_id,),
-        ).fetchone()
-    if booking is None:
+    try:
+        booking = get_object_or_404(
+            Booking.objects.select_related("room", "user"),
+            pk=booking_id,
+        )
+    except Http404:
         return http_not_found(
             request,
             "Бронирование не найдено.",
@@ -76,81 +114,40 @@ def booking_detail(
 
 
 def statistics(request: HttpRequest) -> HttpResponse:
-    """Показать сводку, группировки и отбор групп по числу броней."""
-    with closing(get_connection()) as connection:
-        bookings_count = connection.execute(
-            """
-            SELECT COUNT(*) AS bookings_count
-            FROM bookings
-            WHERE is_cancelled = 0;
-            """
-        ).fetchone()["bookings_count"]
-        summary = connection.execute(
-            """
-            SELECT
-                COUNT(*) AS rooms_count,
-                AVG(capacity) AS average_capacity,
-                MAX(capacity) AS max_capacity
-            FROM rooms;
-            """
-        ).fetchone()
-        by_room = connection.execute(
-            """
-            SELECT
-                rooms.name AS room_name,
-                COUNT(bookings.id) AS bookings_count
-            FROM rooms
-            LEFT JOIN bookings
-                ON rooms.id = bookings.room_id
-                AND bookings.is_cancelled = 0
-            GROUP BY rooms.id, rooms.name
-            ORDER BY bookings_count DESC;
-            """
-        ).fetchall()
-        by_user = connection.execute(
-            """
-            SELECT
-                users.name AS user_name,
-                COUNT(bookings.id) AS bookings_count
-            FROM users
-            LEFT JOIN bookings
-                ON users.id = bookings.user_id
-                AND bookings.is_cancelled = 0
-            GROUP BY users.id, users.name
-            ORDER BY bookings_count DESC;
-            """
-        ).fetchall()
-        popular = connection.execute(
-            """
-            SELECT
-                rooms.name AS room_name,
-                COUNT(bookings.id) AS bookings_count
-            FROM rooms
-            JOIN bookings
-                ON rooms.id = bookings.room_id
-            WHERE bookings.is_cancelled = 0
-            GROUP BY rooms.id, rooms.name
-            HAVING COUNT(bookings.id) > ?
-            ORDER BY bookings_count DESC;
-            """,
-            (1,),
-        ).fetchall()
-        users = connection.execute(
-            """
-            SELECT
-                id,
-                name,
-                email
-            FROM users
-            ORDER BY name;
-            """
-        ).fetchall()
+    """Показать сводку, группировки и помещения с несколькими бронями."""
+    bookings_count = Booking.objects.filter(is_cancelled=False).count()
+    summary = Room.objects.aggregate(
+        rooms_count=Count("id"),
+        average_capacity=Avg("capacity"),
+        max_capacity=Max("capacity"),
+    )
+    by_room = Room.objects.annotate(
+        bookings_count=Count(
+            "bookings",
+            filter=Q(bookings__is_cancelled=False),
+        ),
+        room_name=F("name"),
+    ).values(
+        "room_name",
+        "bookings_count",
+    ).order_by("-bookings_count", "room_name")
+    popular = by_room.filter(bookings_count__gt=1)
+    by_user = User.objects.annotate(
+        bookings_count=Count(
+            "bookings",
+            filter=Q(bookings__is_cancelled=False),
+        ),
+        user_name=F("name"),
+    ).values(
+        "user_name",
+        "bookings_count",
+    ).order_by("-bookings_count", "user_name")
     context = {
         "bookings_count": bookings_count,
         "summary": summary,
         "statistics": by_room,
         "by_user": by_user,
         "popular": popular,
-        "users": users,
+        "users": User.objects.order_by("name"),
     }
     return render(request, "bookings/statistics.html", context)

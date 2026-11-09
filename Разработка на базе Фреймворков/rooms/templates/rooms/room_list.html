@@ -5,6 +5,22 @@
 {% block content %}
 <h1 class="display-4">Помещения</h1>
 <p class="lead">Все переговорные комнаты офиса. Всего: {{ rooms|length }}.</p>
+<form method="get" class="row g-3 align-items-end mb-3">
+    <div class="col-auto">
+        <label class="form-label" for="q">Поиск</label>
+        <input
+            class="form-control"
+            id="q"
+            name="q"
+            value="{{ query }}"
+            placeholder="Название или оборудование"
+        >
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-primary">Найти</button>
+        <a class="btn btn-outline-secondary" href="{% url 'rooms:list' %}">Сбросить</a>
+    </div>
+</form>
 <p>
     <a href="{% url 'rooms:available' %}">Найти свободное помещение</a>
 </p>

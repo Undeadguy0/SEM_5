@@ -9,12 +9,12 @@
         <p class="lead">{{ booking.topic|default:"Без темы" }}</p>
         <ul class="list-group list-group-flush mb-3">
             <li class="list-group-item">Помещение:
-                <a href="{% url 'rooms:detail' booking.room_id %}">{{ booking.room_name|default:"Без названия" }}</a>
+                <a href="{% url 'rooms:detail' booking.room_id %}">{{ booking.room.name|default:"Без названия" }}</a>
             </li>
             <li class="list-group-item">Организатор:
-                {{ booking.user_name }}, {{ booking.user_email }}
+                {{ booking.user.name }}, {{ booking.user.email }}
             </li>
-            <li class="list-group-item">Дата: {{ booking.booking_date }}</li>
+            <li class="list-group-item">Дата: {{ booking.booking_date|date:"Y-m-d" }}</li>
             <li class="list-group-item">Время:
                 {{ booking.start_time }}–{{ booking.end_time }}
             </li>

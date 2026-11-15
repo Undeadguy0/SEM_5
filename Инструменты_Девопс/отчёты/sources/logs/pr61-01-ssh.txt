@@ -1,0 +1,5 @@
+C:\> ssh devops "hostname; whoami; nginx -v; systemctl is-active nginx"
+devops-vm
+devops
+nginx version: nginx/1.30.4 (Ubuntu)
+active

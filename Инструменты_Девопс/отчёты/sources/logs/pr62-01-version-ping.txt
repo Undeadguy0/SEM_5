@@ -1,0 +1,16 @@
+$ ansible --version
+ansible [core 2.22.0]
+  config file = /mnt/h/ПАРЫ/Инструменты_Девопс/_work/pr62-ansible/ansible.cfg
+  configured module search path = ['/home/undeadguy/.ansible/plugins/modules', '/usr/share/ansible/plugins/modules']
+  ansible python module location = /home/undeadguy/ansible-venv/lib/python3.14/site-packages/ansible
+  ansible collection location = /home/undeadguy/.ansible/collections:/usr/share/ansible/collections
+  executable location = /home/undeadguy/ansible-venv/bin/ansible
+  python version = 3.14.4 (main, Jun 18 2026, 14:25:02) [GCC 15.2.0] (/home/undeadguy/ansible-venv/bin/python)
+  jinja version = 3.1.6
+  pyyaml version = 6.0.3 (with libyaml v0.2.5)
+
+$ ansible -i inventory.ini web -m ping
+devops-vm | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}

@@ -1,0 +1,15 @@
+C:\> ssh -p 2222 devops@127.0.0.1
+Welcome to Ubuntu 26.10 (GNU/Linux 7.3.0-9-generic x86_64)
+ ...
+  IPv4 address for enp0s3: 10.0.2.15
+
+0 updates can be applied immediately.
+
+devops@devops-vm:~$ echo; whoami; pwd
+
+devops
+/home/devops
+devops@devops-vm:~$ exit
+logout
+Connection to 127.0.0.1 closed.
+C:\>

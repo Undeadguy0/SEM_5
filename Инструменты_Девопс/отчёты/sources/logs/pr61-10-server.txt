@@ -1,0 +1,22 @@
+$ ls -lR /var/www/static-site
+/var/www/static-site:
+total 12
+drwxr-xr-x 2 devops devops 4096 Nov 13 19:26 css
+drwxr-xr-x 2 devops devops 4096 Nov 13 19:26 img
+-rw-r--r-- 1 devops devops  838 Nov 13 19:28 index.html
+
+/var/www/static-site/css:
+total 4
+-rw-r--r-- 1 devops devops 484 Nov 13 19:26 style.css
+
+/var/www/static-site/img:
+total 4
+-rw-r--r-- 1 devops devops 3559 Nov 13 19:26 logo.png
+
+$ sudo tail -n 6 /var/log/nginx/static-site.access.log
+192.168.56.1 - - [13/Nov/2026:19:29:09 +0000] "GET /img/logo.png HTTP/1.1" 200 3559 "-" "curl/8.16.0"
+192.168.56.1 - - [13/Nov/2026:19:29:09 +0000] "GET / HTTP/1.1" 200 838 "-" "curl/8.16.0"
+192.168.56.1 - - [13/Nov/2026:19:29:09 +0000] "GET / HTTP/1.1" 200 561 "-" "Mozilla/5.0 (Windows NT 10.0; Win6
+192.168.56.1 - - [13/Nov/2026:19:29:09 +0000] "GET /css/style.css HTTP/1.1" 200 484 "http://192.168.56.102/" "
+192.168.56.1 - - [13/Nov/2026:19:29:09 +0000] "GET /img/logo.png HTTP/1.1" 200 3559 "http://192.168.56.102/" "
+192.168.56.1 - - [13/Nov/2026:19:29:10 +0000] "GET /favicon.ico HTTP/1.1" 404 196 "http://192.168.56.102/" "Mo

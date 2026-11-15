@@ -1,0 +1,43 @@
+$ cat inventory.ini
+# PR 6.2: managed server = devops-vm from PR 5.2
+# "devops" is the Windows OpenSSH alias: 127.0.0.1:2222 -> guest :22, key ~/.ssh/devops_vm
+[web]
+devops-vm ansible_host=devops
+
+[web:vars]
+ansible_user=devops
+ansible_become=true
+ansible_python_interpreter=/usr/bin/python3
+# control node is WSL; the VirtualBox NAT port listens on Windows loopback,
+# so Ansible uses Windows ssh.exe as its SSH client
+ansible_ssh_executable=/mnt/c/Windows/System32/OpenSSH/ssh.exe
+ansible_ssh_args=-o ControlMaster=no
+ansible_ssh_transfer_method=piped
+
+$ cat setup.yml
+---
+- name: Configure devops-vm (PR 6.2)
+  hosts: web
+  become: true
+  roles:
+    - { role: base,  tags: ["base"] }
+    - { role: nginx, tags: ["nginx"] }
+    - { role: app,   tags: ["app"] }
+    - { role: ssh,   tags: ["ssh"] }
+
+$ cat group_vars/web.yml
+app_server_name: app.devops.local
+app_root: /var/www/pr62-app
+
+$ cat run.sh ansible.cfg
+cd "$(dirname "$0")"
+export ANSIBLE_CONFIG="$PWD/ansible.cfg" ANSIBLE_FORCE_COLOR=0 PATH="$HOME/ansible-venv/bin:$PATH"
+exec "$@"
+[defaults]
+inventory = inventory.ini
+roles_path = roles
+host_key_checking = True
+retry_files_enabled = False
+
+[ssh_connection]
+pipelining = True

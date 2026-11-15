@@ -1,0 +1,10 @@
+$ ansible-playbook -i inventory.ini setup.yml --syntax-check
+
+playbook: setup.yml
+
+$ ansible-playbook -i inventory.ini setup.yml --list-tags
+
+playbook: setup.yml
+
+  play #1 (web): Configure devops-vm (PR 6.2)	TAGS: []
+      TASK TAGS: [app, base, nginx, ssh]

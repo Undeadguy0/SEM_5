@@ -1,0 +1,17 @@
+> VBoxManage showvminfo devops-vm --machinereadable | findstr Forwarding   (до)
+Forwarding(0)="http,tcp,127.0.0.1,80,,80"
+Forwarding(1)="https,tcp,127.0.0.1,443,,443"
+Forwarding(2)="ssh,tcp,127.0.0.1,2222,,2222"
+
+> VBoxManage controlvm devops-vm natpf1 delete ssh
+> VBoxManage controlvm devops-vm natpf1 "ssh,tcp,127.0.0.1,2222,,22"
+
+> VBoxManage showvminfo devops-vm --machinereadable | findstr Forwarding   (после)
+Forwarding(0)="http,tcp,127.0.0.1,80,,80"
+Forwarding(1)="https,tcp,127.0.0.1,443,,443"
+Forwarding(2)="ssh,tcp,127.0.0.1,2222,,22"
+
+> VBoxManage showvminfo devops-vm | findstr /C:"Rule("
+NIC 1 Rule(0):   name = http, protocol = tcp, host ip = 127.0.0.1, host port = 80, guest ip = , guest port = 80
+NIC 1 Rule(1):   name = https, protocol = tcp, host ip = 127.0.0.1, host port = 443, guest ip = , guest port = 443
+NIC 1 Rule(2):   name = ssh, protocol = tcp, host ip = 127.0.0.1, host port = 2222, guest ip = , guest port = 22

@@ -1,0 +1,22 @@
+# 1-й запуск: на сервере пусто, копируются все файлы
+$ bash deploy.sh
+==> rsync /mnt/h/ПАРЫ/Инструменты_Девопс/_work/pr61-site/ -> devops:/var/www/static-site/
+sending incremental file list
+./
+index.html
+css/
+css/style.css
+img/
+img/logo.png
+
+sent 5,224 bytes  received 99 bytes  10,646.00 bytes/sec
+total size is 4,881  speedup is 0.92
+==> nginx -t && reload
+nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+nginx: configuration file /etc/nginx/nginx.conf test is successful
+reloaded
+==> check http://static.devops.local/ (via 127.0.0.1:80)
+HTTP 200
+<p class="ver">Версия: 1</p>
+==> done
+exit=0

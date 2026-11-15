@@ -1,0 +1,20 @@
+C:\> curl.exe -s -w "\nHTTP %{http_code}\n" -H "Host: app.devops.local" http://127.0.0.1/
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <title>PR 6.2 — сайт развёрнут Ansible</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Hello from Ansible!</h1>
+  <p>Статический сайт загружен ролью <code>app</code> как архив и распакован в <code>/var/www/pr62-app</code>.</p>
+  <p><b>Версия: 2</b> (обновлено через --tags app)</p>
+  <p>Практическая работа 6.2 · Бунто М. В., 2026</p>
+</body>
+</html>
+
+HTTP 200
+
+C:\> curl.exe -s -o NUL -w "%{http_code} %{content_type}" --resolve app.devops.local:80:192.168.56.102 http://app.devops.local/style.css
+200 text/css

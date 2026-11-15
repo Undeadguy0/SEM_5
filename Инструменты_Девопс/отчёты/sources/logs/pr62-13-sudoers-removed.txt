@@ -1,0 +1,12 @@
+$ ls /etc/sudoers.d/
+90-devops-lab
+README
+$ sudo visudo -c
+/etc/sudoers: parsed OK
+$ sudo rm /etc/sudoers.d/90-devops-lab && sudo -k
+removed
+$ ls /etc/sudoers.d/
+README
+$ sudo -n true
+sudo: interactive authentication is required
+rc=1

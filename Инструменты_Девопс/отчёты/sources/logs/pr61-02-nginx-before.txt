@@ -1,0 +1,18 @@
+$ ls -l /etc/nginx/sites-enabled/
+total 0
+lrwxrwxrwx 1 root root 38 Oct 27 08:39 devops-site -> /etc/nginx/sites-available/devops-site
+lrwxrwxrwx 1 root root 30 Oct 27 09:15 kr2 -> /etc/nginx/sites-available/kr2
+
+$ sudo nginx -T 2>/dev/null | grep -E "^\s*(listen|server_name)"
+    listen 80;
+    listen [::]:80;
+    server_name devops.local;
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    server_name devops.local;
+    listen 80;
+    listen [::]:80;
+    server_name api.devops.local;
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    server_name api.devops.local;

@@ -1,0 +1,12 @@
+C:\> curl.exe -s -o NUL -w "%{http_code} %{content_type}" -H "Host: static.devops.local" http://127.0.0.1/
+200 text/html
+
+C:\> curl.exe ... --resolve static.devops.local:80:192.168.56.102 http://static.devops.local/css/style.css
+200 text/css 484B
+
+C:\> curl.exe ... --resolve static.devops.local:80:192.168.56.102 http://static.devops.local/img/logo.png
+200 image/png 3559B
+
+C:\> curl.exe -s http://192.168.56.102/ | findstr "title ver"   # по IP сервера
+  <title>PR 6.1 — статический сайт на nginx</title>
+    <p class="ver">Версия: 2</p>

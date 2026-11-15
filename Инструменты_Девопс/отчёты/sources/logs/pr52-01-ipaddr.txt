@@ -1,0 +1,13 @@
+$ hostname; whoami; ip -br addr
+devops-vm
+devops
+lo               UNKNOWN        127.0.0.1/8 ::1/128 
+enp0s3           UP             10.0.2.15/24 metric 100 fd17:625c:f037:2:a00:27ff:fe71:5612/64 fe80::a00:27ff:fe71:5612/64 
+enp0s8           UP             192.168.56.102/24 metric 100 fe80::a00:27ff:fe2d:11cf/64 
+docker0          DOWN           172.17.0.1/16 
+br-3ad62481d728  UP             172.18.0.1/16 fe80::bc7f:1ff:fe7c:774e/64 
+br-63d64082c32d  UP             172.19.0.1/16 fe80::14dd:66ff:feb4:d51b/64 
+vethfbeba5c@if2  UP             fe80::348c:e0ff:fe7a:4b57/64 
+veth4c65fcc@if2  UP             fe80::2035:f9ff:fe22:8373/64 
+veth7295c24@if2  UP             fe80::98e2:24ff:fec3:a6b4/64 
+vethb5d85fa@if2  UP             fe80::872:4aff:fe38:f670/64 

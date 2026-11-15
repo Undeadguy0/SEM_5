@@ -1,0 +1,28 @@
+$ sudo tar czf /etc/nginx.bak-pr61.tar.gz -C /etc nginx
+-rw-r--r-- 1 root root 7457 Nov 13 19:26 /etc/nginx.bak-pr61.tar.gz
+
+$ sudo install -d -o devops -g www-data -m 755 /var/www/static-site
+drwxr-xr-x 2 devops www-data 4096 Nov 13 19:26 /var/www/static-site
+
+$ sudo tee /etc/nginx/sites-available/static-site
+# PR 6.1: static site (HTTP), separate server block
+server {
+    listen 80;
+    listen [::]:80;
+    server_name static.devops.local 192.168.56.102;
+
+    root /var/www/static-site;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    access_log /var/log/nginx/static-site.access.log;
+    error_log  /var/log/nginx/static-site.error.log;
+}
+
+$ sudo ln -s /etc/nginx/sites-available/static-site /etc/nginx/sites-enabled/
+$ sudo nginx -t
+nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+nginx: configuration file /etc/nginx/nginx.conf test is successful

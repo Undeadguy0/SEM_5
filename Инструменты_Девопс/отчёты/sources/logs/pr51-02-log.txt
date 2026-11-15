@@ -1,0 +1,5 @@
+59c4491 (HEAD -> main, origin/master, origin/main, origin/HEAD) lab 5.1: deploy from default branch master (env protection)
+0034f7e lab 5.1: Actions deploy via Jekyll; Hello page at /hello.html (keep homepage)
+68388b9 lab 5.1: README, index.html, Actions deploy.yml
+9125178 (master) добавление Nim + SQLite
+9c6edcc 1.0

@@ -1,0 +1,11 @@
+$ sudo cp -a /etc/ssh/sshd_config /etc/ssh/sshd_config.bak-pr52
+$ sudo cp -a /etc/ssh/sshd_config.d/99-hardening.conf /etc/ssh/sshd_config.d/99-hardening.conf.bak-pr52
+$ ls -l /etc/ssh/sshd_config* /etc/ssh/sshd_config.d/
+-rw-r--r-- 1 root root 4301 Oct 21 12:08 /etc/ssh/sshd_config
+-rw-r--r-- 1 root root 4301 Oct 21 12:06 /etc/ssh/sshd_config.backup
+-rw-r--r-- 1 root root 4301 Oct 21 12:08 /etc/ssh/sshd_config.bak-pr52
+
+/etc/ssh/sshd_config.d:
+total 8
+-rw-r--r-- 1 root root 218 Oct 21 12:07 99-hardening.conf
+-rw-r--r-- 1 root root 218 Oct 21 12:07 99-hardening.conf.bak-pr52

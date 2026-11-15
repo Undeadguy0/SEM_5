@@ -1,0 +1,2 @@
+C:\> ssh -p 2222 -o PubkeyAuthentication=no devops@127.0.0.1   (без ключа)
+devops@127.0.0.1: Permission denied (publickey).

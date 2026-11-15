@@ -1,0 +1,10 @@
+$ sudo service ssh restart; echo "rc=$?"
+rc=0
+$ systemctl is-active ssh
+active
+
+$ sudo ss -tlnp | grep sshd
+LISTEN 0      128          0.0.0.0:2222      0.0.0.0:*    users:(("sshd",pid=8496,fd=8))
+LISTEN 0      128          0.0.0.0:22        0.0.0.0:*    users:(("sshd",pid=8496,fd=6))
+LISTEN 0      128             [::]:2222         [::]:*    users:(("sshd",pid=8496,fd=9))
+LISTEN 0      128             [::]:22           [::]:*    users:(("sshd",pid=8496,fd=7))

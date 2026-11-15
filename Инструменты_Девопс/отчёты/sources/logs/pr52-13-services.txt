@@ -1,0 +1,14 @@
+$ systemctl is-active nginx docker ssh
+active
+active
+active
+
+$ sudo docker ps --format "table {{.Names}}\t{{.Status}}"
+NAMES         STATUS
+kr2-app-1     Up 31 minutes
+kr2-redis-1   Up 31 minutes (healthy)
+app-app-1     Up 31 minutes
+app-db-1      Up 31 minutes (healthy)
+
+$ curl -sk -o /dev/null -w "%{http_code}\n" https://devops.local/
+200

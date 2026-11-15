@@ -1,0 +1,32 @@
+C:\> curl.exe -sk -o NUL -w "%{http_code}" --resolve devops.local:443:127.0.0.1 https://devops.local/
+200 text/html
+C:\> curl.exe -sk -o NUL -w "%{http_code}" --resolve devops.local:443:127.0.0.1 https://devops.local/app/
+200 text/html; charset=utf-8
+C:\> curl.exe -sk -o NUL -w "%{http_code}" --resolve api.devops.local:443:127.0.0.1 https://api.devops.local/
+200 text/html; charset=utf-8
+C:\> curl.exe -sk -o NUL -w "%{http_code}" --resolve devops.local:80:127.0.0.1 http://devops.local/
+301 text/html
+
+$ systemctl is-active nginx docker ssh
+active
+active
+active
+$ sudo docker ps --format "{{.Names}}: {{.Status}}"
+kr2-app-1: Up 4 minutes
+kr2-redis-1: Up 4 minutes (healthy)
+app-app-1: Up 4 minutes
+app-db-1: Up 4 minutes (healthy)
+$ ls -l /etc/nginx/sites-enabled/
+total 0
+lrwxrwxrwx 1 root root 38 Oct 27 08:39 devops-site -> /etc/nginx/sites-available/devops-site
+lrwxrwxrwx 1 root root 30 Oct 27 09:15 kr2 -> /etc/nginx/sites-available/kr2
+lrwxrwxrwx 1 root root 38 Nov 13 19:26 static-site -> /etc/nginx/sites-available/static-site
+$ sudo ufw status | grep -E "80|443|22"
+80/tcp                     ALLOW       Anywhere                   # HTTP
+443/tcp                    ALLOW       Anywhere                   # HTTPS
+2222/tcp                   LIMIT       Anywhere                   # SSH rate-limited
+22/tcp                     ALLOW       Anywhere                  
+80/tcp (v6)                ALLOW       Anywhere (v6)              # HTTP
+443/tcp (v6)               ALLOW       Anywhere (v6)              # HTTPS
+2222/tcp (v6)              LIMIT       Anywhere (v6)              # SSH rate-limited
+22/tcp (v6)                ALLOW       Anywhere (v6)

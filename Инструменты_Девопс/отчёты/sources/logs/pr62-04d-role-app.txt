@@ -1,0 +1,40 @@
+$ cat roles/app/tasks/main.yml
+---
+- name: Web root for the app
+  ansible.builtin.file:
+    path: "{{ app_root }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Upload and unpack the static site archive
+  ansible.builtin.unarchive:
+    src: site.tar.gz
+    dest: "{{ app_root }}"
+    owner: root
+    group: root
+
+- name: Check the app page through nginx (Host header)
+  ansible.builtin.command: >-
+    curl -s -o /dev/null -w "%{http_code}" -H "Host: {{ app_server_name }}" http://127.0.0.1/
+  register: app_http
+  changed_when: false
+  failed_when: app_http.stdout != "200"
+$ cat roles/nginx/templates/pr62-app.conf.j2
+# managed by Ansible (PR 6.2)
+server {
+    listen 80;
+    listen [::]:80;
+    server_name {{ app_server_name }};
+
+    root {{ app_root }};
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    access_log /var/log/nginx/pr62-app.access.log;
+    error_log  /var/log/nginx/pr62-app.error.log;
+}

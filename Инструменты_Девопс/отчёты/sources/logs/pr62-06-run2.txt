@@ -1,0 +1,60 @@
+$ ansible-playbook -i inventory.ini setup.yml   # 2-й запуск: идемпотентность
+
+PLAY [Configure devops-vm (PR 6.2)] ********************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [devops-vm]
+
+TASK [base : Update apt cache] *************************************************
+ok: [devops-vm]
+
+TASK [base : Upgrade packages (only when base_upgrade=true)] *******************
+skipping: [devops-vm]
+
+TASK [base : Install base utilities and fail2ban] ******************************
+ok: [devops-vm]
+
+TASK [base : fail2ban jail for sshd (ports 22 and 2222, never ban host/NAT)] ***
+ok: [devops-vm]
+
+TASK [base : fail2ban is running and enabled] **********************************
+ok: [devops-vm]
+
+TASK [nginx : Install nginx] ***************************************************
+ok: [devops-vm]
+
+TASK [nginx : Site config for the app (separate server_name, existing sites untouched)] ***
+ok: [devops-vm]
+
+TASK [nginx : Enable the app site] *********************************************
+ok: [devops-vm]
+
+TASK [nginx : nginx is running and enabled] ************************************
+ok: [devops-vm]
+
+TASK [nginx : Apply nginx changes now (nginx -t + reload) before the app role] ***
+
+TASK [app : Web root for the app] **********************************************
+ok: [devops-vm]
+
+TASK [app : Upload and unpack the static site archive] *************************
+ok: [devops-vm]
+
+TASK [app : Check the app page through nginx (Host header)] ********************
+ok: [devops-vm]
+
+TASK [ssh : ~/.ssh exists] *****************************************************
+ok: [devops-vm]
+
+TASK [ssh : Add the public key to authorized_keys] *****************************
+ok: [devops-vm]
+
+TASK [ssh : sshd drop-in (keeps current settings from PR 5.2)] *****************
+ok: [devops-vm]
+
+TASK [ssh : ssh is running and enabled] ****************************************
+ok: [devops-vm]
+
+PLAY RECAP *********************************************************************
+devops-vm                  : ok=16   changed=0    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0   
+

@@ -1,0 +1,23 @@
+$ find . -path ./site-src -prune -o -type f -print | sort   # проект
+./ansible.cfg
+./group_vars/web.yml
+./inventory.ini
+./roles/app/files/site.tar.gz
+./roles/app/tasks/main.yml
+./roles/base/defaults/main.yml
+./roles/base/handlers/main.yml
+./roles/base/tasks/main.yml
+./roles/nginx/handlers/main.yml
+./roles/nginx/tasks/main.yml
+./roles/nginx/templates/pr62-app.conf.j2
+./roles/ssh/defaults/main.yml
+./roles/ssh/files/devops_vm.pub
+./roles/ssh/handlers/main.yml
+./roles/ssh/tasks/main.yml
+./roles/ssh/templates/99-hardening.conf.j2
+./run.sh
+./setup.yml
+
+$ tar tvzf roles/app/files/site.tar.gz
+-rw-r--r-- root/root       476 2026-11-13 22:42 index.html
+-rw-r--r-- root/root       180 2026-11-13 22:42 style.css

@@ -1,0 +1,22 @@
+$ ansible-playbook -i inventory.ini setup.yml --tags "ssh"
+
+PLAY [Configure devops-vm (PR 6.2)] ********************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [devops-vm]
+
+TASK [ssh : ~/.ssh exists] *****************************************************
+ok: [devops-vm]
+
+TASK [ssh : Add the public key to authorized_keys] *****************************
+ok: [devops-vm]
+
+TASK [ssh : sshd drop-in (keeps current settings from PR 5.2)] *****************
+ok: [devops-vm]
+
+TASK [ssh : ssh is running and enabled] ****************************************
+ok: [devops-vm]
+
+PLAY RECAP *********************************************************************
+devops-vm                  : ok=5    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+

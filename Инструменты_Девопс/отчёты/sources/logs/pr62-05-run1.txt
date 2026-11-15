@@ -1,0 +1,112 @@
+$ ansible-playbook -i inventory.ini setup.yml --diff   # 1-й запуск, все роли
+
+PLAY [Configure devops-vm (PR 6.2)] ********************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [devops-vm]
+
+TASK [base : Update apt cache] *************************************************
+changed: [devops-vm]
+
+TASK [base : Upgrade packages (only when base_upgrade=true)] *******************
+skipping: [devops-vm]
+
+TASK [base : Install base utilities and fail2ban] ******************************
+Solving dependencies...
+The following additional packages will be installed:
+  python3-pyasyncore python3-pyinotify whois
+Suggested packages:
+  mailx monit sqlite3 python-pyinotify-doc zip
+The following NEW packages will be installed:
+  fail2ban python3-pyasyncore python3-pyinotify tree unzip whois
+0 upgraded, 6 newly installed, 0 to remove and 35 not upgraded.
+changed: [devops-vm]
+
+TASK [base : fail2ban jail for sshd (ports 22 and 2222, never ban host/NAT)] ***
+--- before
++++ after: /etc/fail2ban/jail.d/pr62-sshd.local
+@@ -0,0 +1,7 @@
++# managed by Ansible (PR 6.2)
++[DEFAULT]
++ignoreip = 127.0.0.1/8 ::1 10.0.2.2 192.168.56.0/24
++
++[sshd]
++enabled = true
++port = 22,2222
+
+changed: [devops-vm]
+
+TASK [base : fail2ban is running and enabled] **********************************
+ok: [devops-vm]
+
+TASK [nginx : Install nginx] ***************************************************
+ok: [devops-vm]
+
+TASK [nginx : Site config for the app (separate server_name, existing sites untouched)] ***
+--- before
++++ after: /home/undeadguy/.ansible/tmp/ansible-local-483qq3_csqv/tmpw4oikhr2/pr62-app.conf.j2
+@@ -0,0 +1,16 @@
++# managed by Ansible (PR 6.2)
++server {
++    listen 80;
++    listen [::]:80;
++    server_name app.devops.local;
++
++    root /var/www/pr62-app;
++    index index.html;
++
++    location / {
++        try_files $uri $uri/ =404;
++    }
++
++    access_log /var/log/nginx/pr62-app.access.log;
++    error_log  /var/log/nginx/pr62-app.error.log;
++}
+\ No newline at end of file
+
+changed: [devops-vm]
+
+TASK [nginx : Enable the app site] *********************************************
+--- before
++++ after
+@@ -1,4 +1,4 @@
+ {
+     "path": "/etc/nginx/sites-enabled/pr62-app",
+-    "state": "absent"
++    "state": "link"
+ }
+
+changed: [devops-vm]
+
+TASK [nginx : nginx is running and enabled] ************************************
+ok: [devops-vm]
+
+TASK [app : Web root for the app] **********************************************
+--- before
++++ after
+@@ -1,4 +1,4 @@
+ {
+     "path": "/var/www/pr62-app",
+-    "state": "absent"
++    "state": "directory"
+ }
+
+changed: [devops-vm]
+
+TASK [app : Upload and unpack the static site archive] *************************
+changed: [devops-vm]
+
+TASK [app : Check the app page through nginx] **********************************
+[ERROR]: Task failed: Module failed: A 'failed_when' expression evaluated to 'True'.
+Origin: /mnt/h/ПАРЫ/Инструменты_Девопс/_work/pr62-ansible/roles/app/tasks/main.yml:17:3
+
+15     group: root
+16
+17 - name: Check the app page through nginx
+     ^ column 3
+
+fatal: [devops-vm]: FAILED! => {"changed": false, "changed_when_result": false, "content": "", "elapsed": 0, "failed_when_result": true, "failed_when_suppressed_exception": "(traceback unavailable)", "msg": "Status code was -1 and not [200]: Request failed: <urlopen error [Errno -3] Temporary failure in name resolution>", "redirected": false, "status": -1, "url": "http://127.0.0.1/"}
+
+PLAY RECAP *********************************************************************
+devops-vm                  : ok=11   changed=7    unreachable=0    failed=1    skipped=1    rescued=0    ignored=0   
+

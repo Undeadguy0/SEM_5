@@ -1,0 +1,12 @@
+PS> Get-Command rsync
+(rsync в Windows не найден)
+
+PS> wsl -l -q
+Ubuntu
+archlinux
+docker-desktop
+
+$ rsync --version | head -1   # WSL Ubuntu
+rsync  version 3.4.1  protocol version 32
+$ ssh devops rsync --version | head -1
+rsync  version 3.5.0  protocol version 32

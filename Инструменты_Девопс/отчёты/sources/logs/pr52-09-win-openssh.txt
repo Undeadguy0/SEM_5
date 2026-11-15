@@ -1,0 +1,11 @@
+PS> Get-WindowsCapability -Online | Where-Object Name -like 'OpenSSH*' | ft Name,State
+Name                         State
+----                         -----
+OpenSSH.Client~~~~0.0.1.0    Installed
+OpenSSH.Server~~~~0.0.1.0    NotPresent
+
+PS> ssh -V
+OpenSSH_for_Windows_9.5p2, LibreSSL 3.8.2
+
+PS> Get-Command ssh | Select Source
+C:\Windows\System32\OpenSSH\ssh.exe

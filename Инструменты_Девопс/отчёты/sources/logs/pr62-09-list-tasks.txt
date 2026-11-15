@@ -1,0 +1,16 @@
+$ ansible-playbook -i inventory.ini setup.yml --list-tasks --tags "base,nginx"
+
+playbook: setup.yml
+
+  play #1 (web): Configure devops-vm (PR 6.2)	TAGS: []
+    tasks:
+      base : Update apt cache	TAGS: [base]
+      base : Upgrade packages (only when base_upgrade=true)	TAGS: [base]
+      base : Install base utilities and fail2ban	TAGS: [base]
+      base : fail2ban jail for sshd (ports 22 and 2222, never ban host/NAT)	TAGS: [base]
+      base : fail2ban is running and enabled	TAGS: [base]
+      nginx : Install nginx	TAGS: [nginx]
+      nginx : Site config for the app (separate server_name, existing sites untouched)	TAGS: [nginx]
+      nginx : Enable the app site	TAGS: [nginx]
+      nginx : nginx is running and enabled	TAGS: [nginx]
+      nginx : Apply nginx changes now (nginx -t + reload) before the app role	TAGS: [nginx]

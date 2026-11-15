@@ -1,0 +1,17 @@
+# 3-й запуск после правки index.html (Версия: 1 -> 2): передаётся только index.html
+$ bash deploy.sh
+==> rsync /mnt/h/ПАРЫ/Инструменты_Девопс/_work/pr61-site/ -> devops:/var/www/static-site/
+sending incremental file list
+index.html
+
+sent 381 bytes  received 56 bytes  874.00 bytes/sec
+total size is 4,881  speedup is 11.17
+==> nginx -t && reload
+nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+nginx: configuration file /etc/nginx/nginx.conf test is successful
+reloaded
+==> check http://static.devops.local/ (via 127.0.0.1:80)
+HTTP 200
+<p class="ver">Версия: 2</p>
+==> done
+exit=0

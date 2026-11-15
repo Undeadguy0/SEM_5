@@ -1,0 +1,20 @@
+# index.html изменён (добавлено «Версия: 2»), архив site.tar.gz пересобран
+$ ansible-playbook -i inventory.ini setup.yml --tags "app"
+
+PLAY [Configure devops-vm (PR 6.2)] ********************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [devops-vm]
+
+TASK [app : Web root for the app] **********************************************
+ok: [devops-vm]
+
+TASK [app : Upload and unpack the static site archive] *************************
+changed: [devops-vm]
+
+TASK [app : Check the app page through nginx (Host header)] ********************
+ok: [devops-vm]
+
+PLAY RECAP *********************************************************************
+devops-vm                  : ok=4    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+

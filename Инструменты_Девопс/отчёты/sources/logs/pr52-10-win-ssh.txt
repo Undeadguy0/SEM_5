@@ -1,0 +1,5 @@
+C:\> ssh -p 2222 -i %USERPROFILE%\.ssh\devops_vm devops@127.0.0.1 "hostname; whoami; uptime; echo SSH_CONNECTION=$SSH_CONNECTION"
+devops-vm
+devops
+ 19:19:44 up 31 min,  1 user,  load average: 0.02, 0.08, 0.05
+SSH_CONNECTION=10.0.2.2 59891 10.0.2.15 22

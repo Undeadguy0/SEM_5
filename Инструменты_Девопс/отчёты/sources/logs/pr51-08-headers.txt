@@ -1,0 +1,15 @@
+===== https://undeadguy0.github.io/ =====
+HTTP/1.1 200 OK
+Content-Length: 73860
+Server: GitHub.com
+Content-Type: text/html; charset=utf-8
+Last-Modified: Fri, 13 Nov 2026 18:01:15 GMT
+Date: Fri, 13 Nov 2026 18:08:05 GMT
+
+===== https://undeadguy0.github.io/hello.html =====
+HTTP/1.1 200 OK
+Content-Length: 322
+Server: GitHub.com
+Content-Type: text/html; charset=utf-8
+Last-Modified: Fri, 13 Nov 2026 18:01:15 GMT
+Date: Fri, 13 Nov 2026 18:08:12 GMT

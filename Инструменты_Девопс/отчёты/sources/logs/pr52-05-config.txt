@@ -1,0 +1,26 @@
+$ sudo diff -u 99-hardening.conf.bak-pr52 99-hardening.conf
+--- /etc/ssh/sshd_config.d/99-hardening.conf.bak-pr52	2026-10-21 12:07:47.531335731 +0000
++++ /etc/ssh/sshd_config.d/99-hardening.conf	2026-11-13 19:18:09.802958082 +0000
+@@ -1,5 +1,6 @@
+ Port 2222
+-PermitRootLogin no
++Port 22
++PermitRootLogin yes
+ PasswordAuthentication no
+ PubkeyAuthentication yes
+ PermitEmptyPasswords no
+
+$ grep -n PermitRootLogin /etc/ssh/sshd_config /etc/ssh/sshd_config.d/99-hardening.conf
+/etc/ssh/sshd_config:55:#PermitRootLogin prohibit-password
+/etc/ssh/sshd_config:103:# the setting of "PermitRootLogin prohibit-password".
+/etc/ssh/sshd_config.d/99-hardening.conf:3:PermitRootLogin yes
+
+$ sudo sshd -t && echo "sshd -t: OK"
+sshd -t: OK
+
+$ sudo sshd -T | grep -E "^(port|permitrootlogin|passwordauthentication|allowusers) "
+Port 2222
+Port 22
+PermitRootLogin yes
+PasswordAuthentication no
+AllowUsers devops

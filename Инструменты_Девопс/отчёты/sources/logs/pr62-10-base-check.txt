@@ -1,0 +1,21 @@
+$ ansible -i inventory.ini web -m ansible.builtin.command -a "fail2ban-client status sshd"
+devops-vm | CHANGED | rc=0 >>
+Status for the jail: sshd
+|- Filter
+|  |- Currently failed:	0
+|  |- Total failed:	0
+|  `- Journal matches:	_SYSTEMD_UNIT=ssh.service + _COMM=sshd
+`- Actions
+   |- Currently banned:	0
+   |- Total banned:	0
+   `- Banned IP list:	
+
+$ ansible -i inventory.ini web -m ansible.builtin.shell -a "dpkg -l curl git htop tree unzip rsync fail2ban | grep ^ii | cut -c1-60"
+devops-vm | CHANGED | rc=0 >>
+ii  curl           8.20.0-2ubuntu11.1  amd64        command 
+ii  fail2ban       1.1.0-11            all          ban host
+ii  git            1:2.55.0-1ubuntu1.1 amd64        fast, sc
+ii  htop           3.5.3-1             amd64        interact
+ii  rsync          3.5.0+ds1-2         amd64        fast, ve
+ii  tree           2.3.2-1             amd64        displays
+ii  unzip          6.0-31ubuntu1       amd64        De-archi

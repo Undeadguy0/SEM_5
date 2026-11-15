@@ -1,0 +1,22 @@
+---
+- name: Web root for the app
+  ansible.builtin.file:
+    path: "{{ app_root }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Upload and unpack the static site archive
+  ansible.builtin.unarchive:
+    src: site.tar.gz
+    dest: "{{ app_root }}"
+    owner: root
+    group: root
+
+- name: Check the app page through nginx (Host header)
+  ansible.builtin.command: >-
+    curl -s -o /dev/null -w "%{http_code}" -H "Host: {{ app_server_name }}" http://127.0.0.1/
+  register: app_http
+  changed_when: false
+  failed_when: app_http.stdout != "200"

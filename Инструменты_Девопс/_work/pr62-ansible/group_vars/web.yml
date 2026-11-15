@@ -1,0 +1,2 @@
+app_server_name: app.devops.local
+app_root: /var/www/pr62-app

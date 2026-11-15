@@ -1,0 +1,34 @@
+---
+- name: ~/.ssh exists
+  ansible.builtin.file:
+    path: "/home/{{ ssh_user }}/.ssh"
+    state: directory
+    owner: "{{ ssh_user }}"
+    group: "{{ ssh_user }}"
+    mode: "0700"
+
+- name: Add the public key to authorized_keys
+  ansible.builtin.lineinfile:
+    path: "/home/{{ ssh_user }}/.ssh/authorized_keys"
+    line: "{{ ssh_pubkey }}"
+    create: true
+    owner: "{{ ssh_user }}"
+    group: "{{ ssh_user }}"
+    mode: "0600"
+
+- name: sshd drop-in (keeps current settings from PR 5.2)
+  ansible.builtin.template:
+    src: 99-hardening.conf.j2
+    dest: /etc/ssh/sshd_config.d/99-hardening.conf
+    owner: root
+    group: root
+    mode: "0644"
+    backup: true
+    validate: "sshd -t -f %s"
+  notify: restart ssh
+
+- name: ssh is running and enabled
+  ansible.builtin.service:
+    name: ssh
+    state: started
+    enabled: true

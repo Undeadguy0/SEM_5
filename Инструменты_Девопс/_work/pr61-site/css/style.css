@@ -1,0 +1,8 @@
+body { margin: 0; font-family: system-ui, sans-serif; background: #f4f6f8; color: #222; }
+header { background: #009639; color: #fff; padding: 24px 32px; }
+header h1 { margin: 0 0 6px; }
+main { max-width: 720px; margin: 32px auto; padding: 0 16px; }
+img { display: block; margin: 0 auto 24px; border-radius: 8px; }
+code { background: #e6e9ec; padding: 1px 5px; border-radius: 4px; }
+.ver { font-weight: bold; color: #009639; }
+footer { text-align: center; color: #777; padding: 24px; }

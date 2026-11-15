@@ -1,0 +1,29 @@
+---
+- name: Install nginx
+  ansible.builtin.apt:
+    name: nginx
+    state: present
+
+- name: Site config for the app (separate server_name, existing sites untouched)
+  ansible.builtin.template:
+    src: pr62-app.conf.j2
+    dest: /etc/nginx/sites-available/pr62-app
+    mode: "0644"
+    backup: true
+  notify: reload nginx
+
+- name: Enable the app site
+  ansible.builtin.file:
+    src: /etc/nginx/sites-available/pr62-app
+    dest: /etc/nginx/sites-enabled/pr62-app
+    state: link
+  notify: reload nginx
+
+- name: nginx is running and enabled
+  ansible.builtin.service:
+    name: nginx
+    state: started
+    enabled: true
+
+- name: Apply nginx changes now (nginx -t + reload) before the app role
+  ansible.builtin.meta: flush_handlers

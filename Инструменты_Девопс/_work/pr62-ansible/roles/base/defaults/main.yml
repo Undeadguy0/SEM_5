@@ -1,0 +1,4 @@
+base_packages: [curl, git, htop, tree, unzip, rsync, fail2ban]
+# full "apt upgrade" is off by default: it could restart docker/nginx of earlier labs
+base_upgrade: false
+f2b_ignoreip: "127.0.0.1/8 ::1 10.0.2.2 192.168.56.0/24"

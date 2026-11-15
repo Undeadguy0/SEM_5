@@ -1,0 +1,16 @@
+# managed by Ansible (PR 6.2)
+server {
+    listen 80;
+    listen [::]:80;
+    server_name {{ app_server_name }};
+
+    root {{ app_root }};
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    access_log /var/log/nginx/pr62-app.access.log;
+    error_log  /var/log/nginx/pr62-app.error.log;
+}

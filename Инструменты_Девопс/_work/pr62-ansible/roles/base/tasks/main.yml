@@ -1,0 +1,35 @@
+---
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Upgrade packages (only when base_upgrade=true)
+  ansible.builtin.apt:
+    upgrade: safe
+  when: base_upgrade | bool
+
+- name: Install base utilities and fail2ban
+  ansible.builtin.apt:
+    name: "{{ base_packages }}"
+    state: present
+
+- name: fail2ban jail for sshd (ports 22 and 2222, never ban host/NAT)
+  ansible.builtin.copy:
+    dest: /etc/fail2ban/jail.d/pr62-sshd.local
+    mode: "0644"
+    content: |
+      # managed by Ansible (PR 6.2)
+      [DEFAULT]
+      ignoreip = {{ f2b_ignoreip }}
+
+      [sshd]
+      enabled = true
+      port = 22,2222
+  notify: restart fail2ban
+
+- name: fail2ban is running and enabled
+  ansible.builtin.service:
+    name: fail2ban
+    state: started
+    enabled: true

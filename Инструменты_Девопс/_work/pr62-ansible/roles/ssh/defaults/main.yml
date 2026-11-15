@@ -1,0 +1,2 @@
+ssh_user: devops
+ssh_pubkey: "{{ lookup('ansible.builtin.file', 'devops_vm.pub') }}"

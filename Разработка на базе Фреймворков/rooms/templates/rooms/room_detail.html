@@ -7,6 +7,10 @@
     <div class="card-body">
         <h1 class="display-4">{{ room.name|default:"Без названия" }}</h1>
         <p class="lead">Вместимость: {{ room.capacity }} мест.</p>
+        <p>
+            Большое помещение:
+            {% if room.is_large %}да{% else %}нет{% endif %}.
+        </p>
         <ul class="list-group list-group-flush mb-3">
             <li class="list-group-item">Оборудование:
                 {% if room.equipment %}

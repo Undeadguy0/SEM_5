@@ -10,10 +10,14 @@ class BookingAdmin(admin.ModelAdmin):
     """Список бронирований со связями."""
 
     list_display = (
-        "booking_date",
+        "id",
         "room",
         "user",
-        "is_cancelled",
+        "booking_date",
+        "status",
     )
-    list_filter = ("is_cancelled", "booking_date")
+    list_display_links = ("id",)
     search_fields = ("topic", "room__name", "user__name")
+    list_filter = ("status", "booking_date")
+    ordering = ("-booking_date",)
+    list_per_page = 20

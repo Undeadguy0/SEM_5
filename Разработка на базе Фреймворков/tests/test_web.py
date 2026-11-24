@@ -7,6 +7,8 @@ pytest.importorskip("django")
 from django.test import Client  # noqa: E402
 from django.test import override_settings  # noqa: E402
 
+from rooms.models import Room  # noqa: E402
+
 
 def _client() -> Client:
     return Client(SERVER_NAME="localhost")
@@ -18,6 +20,8 @@ def test_index_has_navigation():
     assert response.status_code == 200
     assert "Система бронирования переговорных" in text
     assert "Статистика" in text
+    assert "Помещения (" in text
+    assert "Roomly" in text
     assert 'class="nav"' in text
     assert 'class="btn btn-primary' in text
     assert 'name="viewport"' in text
@@ -32,17 +36,20 @@ def test_room_list_and_detail():
     assert "Найти свободное помещение" in listing_text
     assert "list-group" in listing_text
 
-    detail = client.get("/rooms/1/")
+    room = Room.objects.get(pk=1)
+    detail = client.get(room.get_absolute_url())
     detail_text = detail.content.decode()
     assert detail.status_code == 200
+    assert room.slug in room.get_absolute_url()
     assert "Вместимость: 8 мест." in detail_text
+    assert "Большое помещение:" in detail_text
     assert "card-body" in detail_text
     assert (
         "Переговорная свободна" in detail_text
         or "Переговорная уже занята" in detail_text
     )
 
-    missing = client.get("/rooms/999/")
+    missing = client.get("/rooms/net-takogo-pomeshcheniya/")
     assert missing.status_code == 404
     assert "Помещение не найдено." in missing.content.decode()
 
@@ -87,6 +94,9 @@ def test_statistics_page():
     text = response.content.decode()
     assert response.status_code == 200
     assert "Статистика бронирований" in text
+    assert "Активных:" in text
+    assert "Отменённых:" in text
+    assert "Завершённых:" in text
     assert "Переговорная «Альфа»" in text
     assert "Количество бронирований: 2" in text
     assert "Иванов И.И." in text

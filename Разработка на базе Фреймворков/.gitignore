@@ -5,3 +5,4 @@ data/roomly_backup.sqlite
 .odt
 __pycache__/
 .pytest_cache/
+ANSWERS_10.md

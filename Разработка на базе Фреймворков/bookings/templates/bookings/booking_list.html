@@ -4,7 +4,16 @@
 
 {% block content %}
 <h1 class="display-4">Бронирования</h1>
-<p class="lead">Активные бронирования. Всего: {{ page_obj.paginator.count }}.</p>
+<p class="lead">
+    {% if status == "cancelled" %}
+        Отменённые бронирования.
+    {% elif status == "completed" %}
+        Завершённые бронирования.
+    {% else %}
+        Активные бронирования.
+    {% endif %}
+    Всего: {{ page_obj.paginator.count }}.
+</p>
 <form method="get" class="mb-4">
     <div class="row g-3 align-items-end">
         <div class="col-md-3">
@@ -39,6 +48,14 @@
                         {% if selected_user == user.pk|stringformat:"s" %}selected{% endif %}
                     >{{ user.name }}</option>
                 {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label" for="status">Статус</label>
+            <select id="status" name="status" class="form-select">
+                <option value="active" {% if status == "active" %}selected{% endif %}>Активные</option>
+                <option value="cancelled" {% if status == "cancelled" %}selected{% endif %}>Отменённые</option>
+                <option value="completed" {% if status == "completed" %}selected{% endif %}>Завершённые</option>
             </select>
         </div>
         <div class="col-md-3">

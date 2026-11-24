@@ -20,7 +20,7 @@
 | Главная | `/` | `homepage.views.index` |
 | Список помещений | `/rooms/` | `rooms.views.rooms` |
 | Свободные помещения | `/rooms/available/` | `rooms.views.available_rooms` |
-| Помещение | `/rooms/<id>/` | `rooms.views.room_detail` |
+| Помещение | `/rooms/<slug>/` | `rooms.views.room_detail` |
 | Список бронирований | `/bookings/` | `bookings.views.bookings` |
 | Статистика | `/bookings/statistics/` | `bookings.views.statistics` |
 | Бронирование | `/bookings/<id>/` | `bookings.views.booking_detail` |
@@ -94,11 +94,11 @@ View-функции передают данные словарём контек�
 
 | Модель | Приложение | Поля | Связи |
 | --- | --- | --- | --- |
-| `Room` | `rooms` | `name`, `capacity`, `equipment` | — |
+| `Room` | `rooms` | `name`, `capacity`, `equipment`, `slug`, `is_large` | — |
 | `User` | `users` | `name`, `email` | это не пользователь `django.contrib.auth` |
-| `Booking` | `bookings` | `booking_date`, `start_time`, `end_time`, `topic`, `is_cancelled` | `room` и `user`: `on_delete=PROTECT`, `related_name="bookings"` |
+| `Booking` | `bookings` | `booking_date`, `start_time`, `end_time`, `topic`, `status` | `room` и `user`: `on_delete=PROTECT`, `related_name="bookings"` |
 
-`equipment` — строка через запятую. Время хранится как `HH:MM`. Отменённое бронирование комнату не занимает. `Booking.cancel()` ставит признак отмены. `Room.is_suitable_for()` сравнивает вместимость с числом участников.
+`equipment` — строка через запятую. Время хранится как `HH:MM`. Статус бронирования — `Booking.Status`: `active`, `cancelled`, `completed`. Помещение занимает только активное бронирование. `Booking.cancel()` ставит статус `cancelled` и не удаляет запись. `slug` помещения собирается из транслита названия и `id`. `is_large` — вычисляемое поле базы: вместимость от 50 мест. `Room.is_suitable_for()` сравнивает вместимость с числом участников. `Room.get_absolute_url()` возвращает `/rooms/<slug>/`.
 
 Миграции лежат в `rooms/migrations/`, `users/migrations/` и `bookings/migrations/`.
 
@@ -142,20 +142,26 @@ python -m db.import_json
 
 ## Текущий этап разработки
 
-На ПР9 страницы Roomly переведены на Django ORM:
+На ПР10 к ORM-страницам ПР9 добавлены административная панель и проверка запросов:
 
-- модели `Room`, `User` и `Booking` связаны внешними ключами `PROTECT`;
-- миграции описывают таблицы в `db.sqlite3`;
-- данные перенесены из `data/roomly.sqlite` с сохранением `id`;
-- представления не вызывают `sqlite3`;
-- на списках есть поиск, фильтры, сортировка и пагинация.
+- модели `Room`, `User` и `Booking` зарегистрированы в `/admin/` через `ModelAdmin`: столбцы, поиск, фильтры, сортировка, `list_per_page` и inline связанных бронирований;
+- названия приложений и полей в админке русские;
+- статус бронирования хранится в `TextChoices`, старые записи перенесены миграцией из `is_cancelled`;
+- повторяющиеся условия вынесены в `BookingQuerySet`: `active()`, `cancelled()`, `completed()`, `for_date()`;
+- список бронирований фильтруется, сортируется и разбивается на страницы одним QuerySet; связанные названия берутся через `annotate()` и `F()`;
+- карточка бронирования загружает помещение и пользователя через `select_related()`;
+- карточка помещения открывается по `slug`, ссылки строит `get_absolute_url()`;
+- контекстный процессор `rooms.context_processors.room_context` передаёт в шаблоны `site_name` и `rooms_count`;
+- Django Debug Toolbar подключён при `DEBUG = True` и показывает SQL локальных запросов.
 
-JSON и консольная программа сохранены. Формы создания бронирования на сайте нет.
+JSON и консольная программа сохранены: у них по-прежнему поле `is_cancelled`. Формы создания бронирования на сайте нет.
 
 ## Требования
 
 - Python 3.12 (в задании указан 3.11, в системе его нет; Django 5.2 поддерживает 3.12)
 - Django 5.2
+- django-debug-toolbar 5.2
+- Unidecode 1.4
 - pytest
 - flake8
 

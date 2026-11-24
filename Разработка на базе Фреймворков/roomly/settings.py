@@ -30,6 +30,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 
+# Панель отладки только для локальной разработки.
+INTERNAL_IPS = ["127.0.0.1"]
+
 
 # Application definition
 
@@ -44,10 +47,12 @@ INSTALLED_APPS = [
     "rooms",
     "users",
     "bookings",
+    "debug_toolbar",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -68,6 +73,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "rooms.context_processors.room_context",
             ],
         },
     },

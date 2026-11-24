@@ -11,9 +11,7 @@ def index(request: HttpRequest) -> HttpResponse:
     """Показать описание проекта и сводку из ORM."""
     context = {
         "rooms_count": Room.objects.count(),
-        "bookings_count": Booking.objects.filter(
-            is_cancelled=False,
-        ).count(),
+        "bookings_count": Booking.objects.active().count(),
     }
     return render(request, "homepage/index.html", context)
 

@@ -9,7 +9,7 @@
         <p class="lead">{{ booking.topic|default:"Без темы" }}</p>
         <ul class="list-group list-group-flush mb-3">
             <li class="list-group-item">Помещение:
-                <a href="{% url 'rooms:detail' booking.room_id %}">{{ booking.room.name|default:"Без названия" }}</a>
+                <a href="{{ booking.room.get_absolute_url }}">{{ booking.room.name|default:"Без названия" }}</a>
             </li>
             <li class="list-group-item">Организатор:
                 {{ booking.user.name }}, {{ booking.user.email }}

@@ -50,10 +50,10 @@ def rooms(request: HttpRequest) -> HttpResponse:
     return render(request, "rooms/room_list.html", context)
 
 
-def room_detail(request: HttpRequest, room_id: int) -> HttpResponse:
+def room_detail(request: HttpRequest, slug: str) -> HttpResponse:
     """Показать карточку помещения и доступность на сегодня."""
     try:
-        room = get_object_or_404(Room, pk=room_id)
+        room = get_object_or_404(Room, slug=slug)
     except Http404:
         return http_not_found(
             request,
@@ -62,11 +62,12 @@ def room_detail(request: HttpRequest, room_id: int) -> HttpResponse:
             "К списку помещений",
         )
     today = date.today()
-    occupied = Booking.objects.filter(
-        room=room,
-        booking_date=today,
-        is_cancelled=False,
-    ).count()
+    occupied = (
+        Booking.objects.active()
+        .for_date(today)
+        .filter(room=room)
+        .count()
+    )
     available = occupied == 0
     context = {
         "room": room,
@@ -91,10 +92,11 @@ def available_rooms(request: HttpRequest) -> HttpResponse:
         except ValueError:
             error = "Укажите корректную дату."
         else:
-            booked_room_ids = Booking.objects.filter(
-                booking_date=selected_date,
-                is_cancelled=False,
-            ).values_list("room_id", flat=True)
+            booked_room_ids = (
+                Booking.objects.active()
+                .for_date(selected_date)
+                .values_list("room_id", flat=True)
+            )
             room_list = Room.objects.exclude(
                 pk__in=booked_room_ids,
             ).order_by("name")

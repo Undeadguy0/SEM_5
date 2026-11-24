@@ -4,13 +4,17 @@
 
 {% block content %}
 <h1 class="display-4">Статистика бронирований</h1>
-<p class="lead">Активных бронирований: {{ bookings_count }}.</p>
+<p class="lead">
+    Активных: {{ status_stats.active_bookings }}.
+    Отменённых: {{ status_stats.cancelled_bookings }}.
+    Завершённых: {{ status_stats.completed_bookings }}.
+</p>
 <p>
     Помещений: {{ summary.rooms_count }}.
     Средняя вместимость: {{ summary.average_capacity|floatformat:1 }}.
     Максимальная вместимость: {{ summary.max_capacity }}.
 </p>
-<h2 class="h4">По помещениям</h2>
+<h2 class="h4">По помещениям, только активные</h2>
 <div class="list-group mb-4">
     {% for item in statistics %}
         <article class="list-group-item statistics-item">

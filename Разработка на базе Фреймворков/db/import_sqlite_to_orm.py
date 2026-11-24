@@ -120,7 +120,11 @@ def main() -> None:
                     "start_time": row["start_time"],
                     "end_time": row["end_time"],
                     "topic": row["topic"],
-                    "is_cancelled": bool(row["is_cancelled"]),
+                    "status": (
+                        Booking.Status.CANCELLED
+                        if row["is_cancelled"]
+                        else Booking.Status.ACTIVE
+                    ),
                 },
             )
         _sync_sequence(Room)

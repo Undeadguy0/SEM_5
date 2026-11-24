@@ -25,21 +25,30 @@ SORT_FIELDS = {
     "room": "room__name",
     "user": "user__name",
 }
+STATUS_FILTERS = {
+    "active": Booking.objects.active,
+    "cancelled": Booking.objects.cancelled,
+    "completed": Booking.objects.completed,
+}
 PAGE_SIZE = 5
 
 
 def bookings(request: HttpRequest) -> HttpResponse:
-    """Показать активные бронирования с фильтрами и страницами."""
+    """Показать бронирования с фильтрами и страницами."""
     booking_date = request.GET.get("date", "").strip()
     room_id = request.GET.get("room", "").strip()
     user_id = request.GET.get("user", "").strip()
     query = request.GET.get("q", "").strip()
     sort = request.GET.get("sort", "date")
-    error = None
+    status = request.GET.get("status", "").strip() or "active"
+    errors = []
     if sort not in SORT_FIELDS:
         sort = "date"
+    if status not in STATUS_FILTERS:
+        errors.append("Укажите корректный статус.")
+        status = "active"
 
-    bookings_data = Booking.objects.filter(is_cancelled=False)
+    bookings_data = STATUS_FILTERS[status]()
     if booking_date:
         try:
             selected_date = datetime.strptime(
@@ -47,11 +56,9 @@ def bookings(request: HttpRequest) -> HttpResponse:
                 "%Y-%m-%d",
             ).date()
         except ValueError:
-            error = "Укажите корректную дату."
+            errors.append("Укажите корректную дату.")
         else:
-            bookings_data = bookings_data.filter(
-                booking_date=selected_date,
-            )
+            bookings_data = bookings_data.for_date(selected_date)
     if room_id.isdigit():
         bookings_data = bookings_data.filter(room_id=int(room_id))
     if user_id.isdigit():
@@ -70,7 +77,7 @@ def bookings(request: HttpRequest) -> HttpResponse:
         "start_time",
         "end_time",
         "topic",
-        "is_cancelled",
+        "status",
         "room_name",
         "capacity",
         "user_name",
@@ -85,9 +92,10 @@ def bookings(request: HttpRequest) -> HttpResponse:
         "selected_user": user_id,
         "query": query,
         "sort": sort,
+        "status": status,
         "rooms": Room.objects.order_by("name"),
         "users": User.objects.order_by("name"),
-        "error": error,
+        "error": " ".join(errors),
     }
     return render(request, "bookings/booking_list.html", context)
 
@@ -114,8 +122,22 @@ def booking_detail(
 
 
 def statistics(request: HttpRequest) -> HttpResponse:
-    """Показать сводку, группировки и помещения с несколькими бронями."""
-    bookings_count = Booking.objects.filter(is_cancelled=False).count()
+    """Показать сводку по статусам, помещениям и организаторам."""
+    status_stats = Booking.objects.aggregate(
+        total_bookings=Count("id"),
+        active_bookings=Count(
+            "id",
+            filter=Q(status=Booking.Status.ACTIVE),
+        ),
+        cancelled_bookings=Count(
+            "id",
+            filter=Q(status=Booking.Status.CANCELLED),
+        ),
+        completed_bookings=Count(
+            "id",
+            filter=Q(status=Booking.Status.COMPLETED),
+        ),
+    )
     summary = Room.objects.aggregate(
         rooms_count=Count("id"),
         average_capacity=Avg("capacity"),
@@ -124,7 +146,7 @@ def statistics(request: HttpRequest) -> HttpResponse:
     by_room = Room.objects.annotate(
         bookings_count=Count(
             "bookings",
-            filter=Q(bookings__is_cancelled=False),
+            filter=Q(bookings__status=Booking.Status.ACTIVE),
         ),
         room_name=F("name"),
     ).values(
@@ -135,7 +157,7 @@ def statistics(request: HttpRequest) -> HttpResponse:
     by_user = User.objects.annotate(
         bookings_count=Count(
             "bookings",
-            filter=Q(bookings__is_cancelled=False),
+            filter=Q(bookings__status=Booking.Status.ACTIVE),
         ),
         user_name=F("name"),
     ).values(
@@ -143,7 +165,7 @@ def statistics(request: HttpRequest) -> HttpResponse:
         "bookings_count",
     ).order_by("-bookings_count", "user_name")
     context = {
-        "bookings_count": bookings_count,
+        "status_stats": status_stats,
         "summary": summary,
         "statistics": by_room,
         "by_user": by_user,

@@ -8,11 +8,13 @@ from django.http import Http404
 from django.http import HttpRequest
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
+from django.shortcuts import redirect
 from django.shortcuts import render
 
 from bookings.models import Booking
 from domain.bookings import get_booking_status
 from homepage.views import http_not_found
+from rooms.forms import RoomForm
 from rooms.models import Room
 
 
@@ -76,6 +78,51 @@ def room_detail(request: HttpRequest, slug: str) -> HttpResponse:
         "status": get_booking_status(available),
     }
     return render(request, "rooms/room_detail.html", context)
+
+
+def room_create(request: HttpRequest) -> HttpResponse:
+    """Создать помещение и сохранить загруженное изображение."""
+    if request.method == "POST":
+        form = RoomForm(request.POST, request.FILES)
+        if form.is_valid():
+            room = form.save()
+            return redirect(room.get_absolute_url())
+    else:
+        form = RoomForm()
+    return render(
+        request,
+        "rooms/room_form.html",
+        {"form": form},
+    )
+
+
+def room_update(request: HttpRequest, slug: str) -> HttpResponse:
+    """Изменить помещение и его изображение."""
+    try:
+        room = get_object_or_404(Room, slug=slug)
+    except Http404:
+        return http_not_found(
+            request,
+            "Помещение не найдено.",
+            "rooms:list",
+            "К списку помещений",
+        )
+    if request.method == "POST":
+        form = RoomForm(
+            request.POST,
+            request.FILES,
+            instance=room,
+        )
+        if form.is_valid():
+            room = form.save()
+            return redirect(room.get_absolute_url())
+    else:
+        form = RoomForm(instance=room)
+    return render(
+        request,
+        "rooms/room_form.html",
+        {"form": form, "room": room},
+    )
 
 
 def available_rooms(request: HttpRequest) -> HttpResponse:

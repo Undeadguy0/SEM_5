@@ -18,3 +18,53 @@
 .roomly-footer {
     color: #6c757d;
 }
+
+.booking-filter-form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding: 16px;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+}
+
+.filter-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 180px;
+}
+
+.filter-field input,
+.filter-field select {
+    padding: 8px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+}
+
+.form-error,
+.filter-field .errorlist {
+    color: #dc3545;
+    font-size: 0.875rem;
+    list-style: none;
+    padding-left: 0;
+    margin-top: 4px;
+}
+
+.booking-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.room-photo {
+    display: block;
+    max-width: 420px;
+    height: auto;
+    margin-bottom: 16px;
+    border-radius: 0.5rem;
+}

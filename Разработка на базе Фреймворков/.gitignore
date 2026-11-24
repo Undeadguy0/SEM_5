@@ -6,3 +6,5 @@ data/roomly_backup.sqlite
 __pycache__/
 .pytest_cache/
 ANSWERS_10.md
+ANSWERS_11.md
+media/

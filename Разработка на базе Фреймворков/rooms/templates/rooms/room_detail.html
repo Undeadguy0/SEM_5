@@ -6,6 +6,15 @@
 <div class="card room-card">
     <div class="card-body">
         <h1 class="display-4">{{ room.name|default:"Без названия" }}</h1>
+        {% if room.image %}
+            <img
+                src="{{ room.image.url }}"
+                alt="{{ room.name|default:'Помещение' }}"
+                class="room-photo img-fluid"
+            >
+        {% else %}
+            <p>Изображение не загружено.</p>
+        {% endif %}
         <p class="lead">Вместимость: {{ room.capacity }} мест.</p>
         <p>
             Большое помещение:
@@ -28,6 +37,7 @@
             </li>
         </ul>
         <a class="btn btn-primary" href="{% url 'rooms:list' %}">К списку помещений</a>
+        <a class="btn btn-outline-primary" href="{% url 'rooms:edit' room.slug %}">Изменить</a>
     </div>
 </div>
 {% endblock %}

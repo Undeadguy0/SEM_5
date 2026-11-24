@@ -36,6 +36,12 @@ class Room(models.Model):
         default="",
         verbose_name="Оборудование",
     )
+    image = models.ImageField(
+        upload_to="rooms/",
+        blank=True,
+        null=True,
+        verbose_name="Изображение",
+    )
     slug = models.SlugField(
         max_length=180,
         unique=True,

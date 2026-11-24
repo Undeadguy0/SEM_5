@@ -23,6 +23,17 @@
             </li>
         </ul>
         <a class="btn btn-primary" href="{% url 'bookings:bookings' %}">К списку бронирований</a>
+        {% if booking.status == "active" %}
+            <a class="btn btn-warning" href="{% url 'bookings:booking_update' booking.id %}">Редактировать</a>
+            <form
+                method="post"
+                action="{% url 'bookings:booking_cancel' booking.id %}"
+                class="d-inline"
+            >
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Отменить</button>
+            </form>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

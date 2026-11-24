@@ -23,6 +23,7 @@
 </form>
 <p>
     <a href="{% url 'rooms:available' %}">Найти свободное помещение</a>
+    <a class="btn btn-primary" href="{% url 'rooms:create' %}">Добавить помещение</a>
 </p>
 <div class="list-group">
     {% for room in rooms %}

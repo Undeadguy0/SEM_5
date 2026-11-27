@@ -10,7 +10,6 @@ from bookings.models import Booking
 from rooms.models import Room
 from users.models import User
 
-
 _CLOCK_RE = re.compile(r"^(\d{2}):(\d{2})(?::\d{2})?$")
 
 
@@ -46,7 +45,7 @@ def normalize_clock_time(value):
 
 
 class BookingFilterForm(forms.Form):
-    """Параметры фильтрации списка. Запись в базу не создаёт."""
+    """Параметры фильтрации списка."""
 
     date = forms.DateField(
         required=False,
@@ -101,11 +100,7 @@ class BookingFilterForm(forms.Form):
 
 
 class BookingForm(forms.ModelForm):
-    """Создание и редактирование бронирования.
-
-    Поле status в форму не входит: новая запись получает статус
-    модели по умолчанию, а при правке статус остаётся у объекта.
-    """
+    """Создание и редактирование бронирования."""
 
     class Meta:
         """Поля, подписи и виджеты формы."""
